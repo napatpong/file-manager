@@ -60,22 +60,21 @@ DATABASE_PATH=./database/filemanager.db
 NODE_ENV=production
 ```
 
-### 4. Make startup scripts executable
+### 5. Make startup scripts executable
 
 ```bash
 chmod +x start-pm2.sh
 ```
 
-### 5. Start the application with PM2
+### 6. Start the application with PM2
 
 ```bash
+# PM2 will automatically start both backend and frontend
 pm2 start ecosystem.config.js
 
 # Or use the convenience script
 ./start-pm2.sh
 ```
-
-### 6. Setup PM2 startup on system boot
 
 ```bash
 pm2 startup
@@ -90,23 +89,26 @@ pm2 save
 ## Monitoring
 
 ```bash
-# View status
+# View status of both services
 pm2 status
 
-# View logs
+# View all logs
+pm2 logs
+
+# View logs for backend
 pm2 logs file-manager-backend
+
+# View logs for frontend
+pm2 logs file-manager-frontend
 
 # Monitor resources
 pm2 monit
-
-# Save current setup
-pm2 save
 ```
 
 ## Common Commands
 
 ```bash
-# Start all services
+# Start all services (backend + frontend)
 pm2 start ecosystem.config.js
 
 # Restart all services
@@ -118,11 +120,19 @@ pm2 stop all
 # Delete all services
 pm2 delete all
 
-# View logs
+# View status and logs
+pm2 status
 pm2 logs
 
-# Tail specific app logs
+# Tail logs for specific app
 pm2 logs file-manager-backend
+pm2 logs file-manager-frontend
+
+# Monitor resources
+pm2 monit
+
+# Save PM2 configuration
+pm2 save
 ```
 
 ## Firewall Configuration (if needed)

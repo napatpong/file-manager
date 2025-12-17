@@ -11,19 +11,11 @@ Write-Host ""
 
 $appPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 
-# Start backend with PM2
-Write-Host "Starting backend with PM2..." -ForegroundColor Yellow
+# Start backend and frontend with PM2
+Write-Host "Starting backend and frontend with PM2..." -ForegroundColor Yellow
 pm2 start ecosystem.config.js
 
 Start-Sleep -Seconds 2
-
-# Start frontend
-Write-Host "Starting frontend in production mode..." -ForegroundColor Yellow
-$frontendPath = Join-Path $appPath "frontend"
-Start-Process cmd -ArgumentList @(
-    "/k",
-    "cd /d `"$frontendPath`" && npm run preview"
-) -WindowStyle Normal
 
 Write-Host ""
 Write-Host "✅ Both servers started in production mode!" -ForegroundColor Green

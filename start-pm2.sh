@@ -11,17 +11,11 @@ echo ""
 
 APP_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Start backend with PM2
-echo -e "\033[33mStarting backend with PM2...\033[0m"
+# Start backend and frontend with PM2
+echo -e "\033[33mStarting backend and frontend with PM2...\033[0m"
 pm2 start ecosystem.config.js
 
 sleep 2
-
-# Start frontend
-echo -e "\033[33mStarting frontend in production mode...\033[0m"
-cd "$APP_PATH/frontend"
-npm run preview &
-FRONTEND_PID=$!
 
 echo ""
 echo -e "\033[32m✅ Both servers started in production mode!\033[0m"
