@@ -99,7 +99,7 @@ const FileAccess = () => {
   if (loading) return <div className="text-center py-8">Loading...</div>;
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+    <div className="w-full bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
           <FiKey className="text-3xl text-blue-600" />
@@ -114,7 +114,7 @@ const FileAccess = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Files List */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className="bg-white rounded-lg shadow-lg p-6 overflow-hidden">
             <h2 className="text-xl font-bold mb-4 text-gray-800">Files</h2>
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {files.length === 0 ? (
@@ -139,9 +139,9 @@ const FileAccess = () => {
           </div>
 
           {/* Access Management */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 overflow-hidden">
             {selectedFile ? (
-              <div className="bg-white rounded-lg shadow-lg p-6">
+              <div className="bg-white rounded-lg shadow-lg p-6 overflow-hidden">
                 <h2 className="text-xl font-bold mb-4 text-gray-800">
                   {selectedFile.originalname}
                 </h2>
@@ -278,7 +278,7 @@ const FileAccess = () => {
                 </div>
               </div>
             ) : (
-              <div className="bg-white rounded-lg shadow-lg p-8 text-center">
+              <div className="bg-white rounded-lg shadow-lg p-8 text-center overflow-hidden">
                 <p className="text-gray-500 text-lg">Select a file to manage access</p>
               </div>
             )}
