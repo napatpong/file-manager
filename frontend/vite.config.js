@@ -15,6 +15,16 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 12443,
     open: false,
-    https: false
+    https: false,
+    allowedHosts: [
+      'localhost',
+      '127.0.0.1',
+      '172.16.0.22',
+      'www.itc.in.th',
+      'itc.in.th',
+      'drive.itc.in.th',
+      'drive.itc-group.co.th',
+      'drive.refritech.co.th'
+    ]
   }
 })

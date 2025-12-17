@@ -45,6 +45,10 @@ function initializeAdminUser() {
 initializeAdminUser();
 
 // Middleware
+// Trust proxy and allow X-Forwarded headers
+app.set('trust proxy', true);
+
+// CORS configuration - allow all origins
 app.use(cors({
   origin: '*',
   credentials: false,
