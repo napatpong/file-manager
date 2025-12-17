@@ -35,6 +35,15 @@
       "role": "downloader",
       "created_at": "2025-12-16T04:17:04.896Z",
       "updated_at": "2025-12-16T04:17:04.896Z"
+    },
+    {
+      "id": 5,
+      "username": "pomp",
+      "email": "pomp@itc.in.th",
+      "password": "$2a$10$3mMGIhQHGa0Kc7AMa4oUXe9GNGG.o0/5yHTD4weslY..k2XiCa.H2",
+      "role": "downloader",
+      "created_at": "2025-12-17T09:31:19.885Z",
+      "updated_at": "2025-12-17T09:31:19.885Z"
     }
   ],
   "files": [
@@ -463,6 +472,12 @@
       "canDownload": 1,
       "canManage": 0,
       "createdAt": "2025-12-16T04:17:04.896Z"
+    },
+    {
+      "id": 5,
+      "userId": 5,
+      "canUpload": 1,
+      "createdAt": "2025-12-17T09:31:19.885Z"
     }
   ],
   "file_access": [
@@ -510,10 +525,10 @@
     }
   ],
   "nextIds": {
-    "users": 5,
+    "users": 6,
     "files": 11,
     "file_downloads": 55,
-    "user_permissions": 5,
+    "user_permissions": 6,
     "file_access": 8
   }
 }
