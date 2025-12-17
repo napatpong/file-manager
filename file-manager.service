@@ -1,0 +1,19 @@
+[Unit]
+Description=File Manager App Backend Service
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/opt/file-manager
+Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+Environment="NODE_ENV=production"
+ExecStart=/usr/local/bin/pm2 start /opt/file-manager/ecosystem.config.js --no-daemon
+ExecRestart=/usr/local/bin/pm2 restart ecosystem.config.js
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

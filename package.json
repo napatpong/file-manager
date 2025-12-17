@@ -1,6 +1,20 @@
 {
+  "name": "file-manager-app",
+  "version": "1.0.0",
+  "description": "File Manager Application with Backend and Frontend",
+  "type": "module",
+  "scripts": {
+    "install:all": "cd backend && npm install && cd ../frontend && npm install && cd ..",
+    "build:all": "cd frontend && npm run build && cd ..",
+    "dev:all": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm start",
+    "dev:frontend": "cd frontend && npm run dev",
+    "prod:all": "pm2 start ecosystem.config.js && cd frontend && npm run preview",
+    "deploy": "git push origin main"
+  },
   "devDependencies": {
     "@cloudflare/kv-asset-handler": "^0.4.1",
-    "@cloudflare/wrangler": "^1.21.0"
+    "@cloudflare/wrangler": "^1.21.0",
+    "concurrently": "^8.2.2"
   }
 }
