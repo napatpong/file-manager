@@ -6,11 +6,13 @@ const isDev = process.env.NODE_ENV === 'development'
 export default defineConfig({
   plugins: [react()],
   server: {
+    host: '0.0.0.0',
     port: isDev ? 3000 : 12443,
     open: isDev ? true : false,
     https: false
   },
   preview: {
+    host: '0.0.0.0',
     port: 12443,
     open: false,
     https: false
