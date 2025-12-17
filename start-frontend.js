@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 
-const { spawn } = require('child_process');
-const path = require('path');
-const os = require('os');
+import { spawn } from 'child_process';
+import path from 'path';
+import os from 'os';
+import { fileURLToPath } from 'url';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const frontendDir = path.join(__dirname, 'frontend');
 const isWindows = os.platform() === 'win32';
 
