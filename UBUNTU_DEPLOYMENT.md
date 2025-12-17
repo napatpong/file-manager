@@ -70,7 +70,7 @@ chmod +x start-pm2.sh
 
 ```bash
 # PM2 will automatically start both backend and frontend
-pm2 start ecosystem.config.js
+pm2 start ecosystem.config.cjs
 
 # Or use the convenience script
 ./start-pm2.sh
@@ -109,7 +109,7 @@ pm2 monit
 
 ```bash
 # Start all services (backend + frontend)
-pm2 start ecosystem.config.js
+pm2 start ecosystem.config.cjs
 
 # Restart all services
 pm2 restart all

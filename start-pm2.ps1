@@ -13,7 +13,7 @@ $appPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 # Start backend and frontend with PM2
 Write-Host "Starting backend and frontend with PM2..." -ForegroundColor Yellow
-pm2 start ecosystem.config.js
+pm2 start ecosystem.config.cjs
 
 Start-Sleep -Seconds 2
 

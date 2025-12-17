@@ -62,7 +62,7 @@ echo "1. Clone the repository: git clone https://github.com/napatpong/file-manag
 echo "2. cd $APP_DIR"
 echo "3. Install app dependencies: npm run install:all"
 echo "4. Build frontend: cd frontend && npm run build && cd .."
-echo "5. Start both services: pm2 start ecosystem.config.js"
+echo "5. Start both services: pm2 start ecosystem.config.cjs"
 echo "6. Setup PM2 boot: pm2 startup"
 echo "7. Save PM2: pm2 save"
 echo ""

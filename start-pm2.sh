@@ -13,7 +13,7 @@ APP_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Start backend and frontend with PM2
 echo -e "\033[33mStarting backend and frontend with PM2...\033[0m"
-pm2 start ecosystem.config.js
+pm2 start ecosystem.config.cjs
 
 sleep 2
 
