@@ -22,16 +22,15 @@ module.exports = {
     },
     {
       name: 'file-manager-frontend',
-      script: 'npm',
-      args: 'run preview',
-      cwd: './frontend',
+      script: './start-frontend.sh',
+      cwd: './',
       instances: 1,
       exec_mode: 'fork',
       env: {
         NODE_ENV: 'production'
       },
-      error_file: '../logs/frontend-error.log',
-      out_file: '../logs/frontend-out.log',
+      error_file: './logs/frontend-error.log',
+      out_file: './logs/frontend-out.log',
       log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
       watch: false,
       max_memory_restart: '300M',
