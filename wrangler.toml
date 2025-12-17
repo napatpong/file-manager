@@ -1,7 +1,8 @@
 name = "file-manager-frontend"
 main = "src/index.js"
 account_id = "9debd4f6eee43dbbbbaf116d20f8ea01"
-compatibility_date = "2025-12-16"
+compatibility_date = "2025-12-17"
+compatibility_flags = ["nodejs_compat"]
 
 # Build configuration
 build = { command = "npm run build", cwd = "./frontend" }
