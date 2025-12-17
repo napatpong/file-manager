@@ -178,7 +178,7 @@ const FileAccess = () => {
                 </div>
 
                 {/* Access List */}
-                <div>
+                <div className="max-h-96 overflow-y-auto">
                   <h3 className="font-bold text-gray-800 mb-4">Users with Access</h3>
                   {(() => {
                     // Get uploader user object
