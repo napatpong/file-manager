@@ -1,0 +1,24 @@
+name = "file-manager-frontend"
+main = "src/index.js"
+account_id = "9debd4f6eee43dbbbbaf116d20f8ea01"
+compatibility_date = "2025-12-16"
+
+# Build configuration
+build = { command = "npm run build", cwd = "./frontend" }
+
+# Environment-specific configuration
+[env.production]
+routes = [
+  { pattern = "drive.itc-group.co.th/*", zone_name = "itc-group.co.th" }
+]
+vars = { API_URL = "http://driveback.itc-group.co.th:2087" }
+kv_namespaces = [
+  { binding = "__STATIC_CONTENT", id = "c544c5e555ef4d63b27fb83976b7b5dd", preview_id = "6983b8b99dc0468db188109db7819f09" }
+]
+
+[env.development]
+vars = { API_URL = "http://localhost:2087" }
+kv_namespaces = [
+  { binding = "__STATIC_CONTENT", id = "c544c5e555ef4d63b27fb83976b7b5dd", preview_id = "6983b8b99dc0468db188109db7819f09" }
+]
+

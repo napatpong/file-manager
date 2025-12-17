@@ -1,0 +1,71 @@
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import bcrypt from 'bcryptjs';
+import db from './database/init.js';
+import authRoutes from './routes/auth.js';
+import fileRoutes from './routes/files.js';
+import userRoutes from './routes/users.js';
+
+// Load environment variables based on NODE_ENV
+const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env';
+dotenv.config({ path: envFile });
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// Auto-seed database on startup
+function initializeAdminUser() {
+  const existingAdmin = db.prepare('SELECT * FROM users WHERE username = ?').get('admin');
+  if (!existingAdmin) {
+    const hashedPassword = bcrypt.hashSync('admin123', 10);
+    const result = db.prepare(`
+      INSERT INTO users (username, email, password, role)
+      VALUES (?, ?, ?, ?)
+    `).run('admin', 'admin@filemanager.com', hashedPassword, 'admin');
+
+    db.prepare(`
+      INSERT INTO user_permissions (userId, canUpload, canDownload, canManage)
+      VALUES (?, ?, ?, ?)
+    `).run(result.lastInsertRowid, 1, 1, 1);
+
+    console.log('✓ Admin user created: admin / admin123');
+  }
+}
+
+initializeAdminUser();
+
+// Middleware
+app.use(cors());
+// Increase body size limit to 1GB for large file uploads
+app.use(express.json({ limit: '1gb' }));
+app.use(express.urlencoded({ limit: '1gb', extended: true }));
+
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/files', fileRoutes);
+app.use('/api/users', userRoutes);
+
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({ message: 'Server is running' });
+});
+
+// 404
+app.use((req, res) => {
+  res.status(404).json({ message: 'Route not found' });
+});
+
+// Error handling
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).json({ message: 'Internal server error', error: err.message });
+});
+
+const server = app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+  console.log(`Database initialized at ${process.env.DATABASE_PATH}`);
+});
+
+// Set timeout for large file uploads (10 minutes)
+server.setTimeout(600000);
