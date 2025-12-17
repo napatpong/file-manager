@@ -8,8 +8,18 @@ if (isCloudflare) {
   // Use same origin (worker proxies to backend)
   API_URL = `${window.location.protocol}//${window.location.hostname}`
 } else {
-  // Check for env variable, fall back to port 2087 for production, 5000 for dev
-  API_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'production' ? 'http://localhost:2087' : 'http://localhost:5000')
+  // Use environment variable
+  if (import.meta.env.VITE_API_URL) {
+    API_URL = import.meta.env.VITE_API_URL
+  } else {
+    // For any other cases, use same protocol and construct API URL using current hostname:2087
+    if (typeof window !== 'undefined') {
+      API_URL = `${window.location.protocol}//${window.location.hostname}:2087`
+    } else {
+      // Fallback for SSR
+      API_URL = 'http://localhost:2087'
+    }
+  }
 }
 
 export default API_URL
