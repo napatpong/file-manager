@@ -99,24 +99,23 @@ const FileAccess = () => {
   if (loading) return <div className="text-center py-8">Loading...</div>;
 
   return (
-    <div className="w-full bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-center gap-3 mb-8">
-          <FiKey className="text-3xl text-blue-600" />
-          <h1 className="text-3xl font-bold text-gray-800">File Access Control</h1>
+    <div className="max-w-7xl mx-auto p-3">
+      <div className="flex items-center gap-3 mb-3">
+        <FiKey className="text-3xl text-blue-600" />
+        <h1 className="text-3xl font-bold text-gray-800">File Access Control</h1>
+      </div>
+
+      {error && (
+        <div className="mb-3 p-4 bg-red-100 text-red-700 rounded-lg">
+          {error}
         </div>
+      )}
 
-        {error && (
-          <div className="mb-6 p-4 bg-red-100 text-red-700 rounded-lg">
-            {error}
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Files List */}
-          <div className="bg-white rounded-lg shadow-lg p-6 overflow-hidden">
-            <h2 className="text-xl font-bold mb-4 text-gray-800">Files</h2>
-            <div className="space-y-2 max-h-96 overflow-y-auto">
+          <div className="bg-white rounded-lg shadow-lg p-3">
+            <h2 className="text-xl font-bold mb-2 text-gray-800">Files</h2>
+            <div className="space-y-2">
               {files.length === 0 ? (
                 <p className="text-gray-500">No files available</p>
               ) : (
@@ -139,16 +138,16 @@ const FileAccess = () => {
           </div>
 
           {/* Access Management */}
-          <div className="lg:col-span-2 overflow-hidden">
+          <div>
             {selectedFile ? (
-              <div className="bg-white rounded-lg shadow-lg p-6 overflow-hidden">
-                <h2 className="text-xl font-bold mb-4 text-gray-800">
+              <div className="bg-white rounded-lg shadow-lg p-3">
+                <h2 className="text-xl font-bold mb-2 text-gray-800">
                   {selectedFile.originalname}
                 </h2>
 
                 {/* Grant Access Section */}
-                <div className="mb-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <h3 className="font-bold text-gray-800 mb-4">Grant Access</h3>
+                <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <h3 className="font-bold text-gray-800 mb-2">Grant Access</h3>
                   <div className="flex gap-2">
                     <select
                       value={selectedUserId}
@@ -178,8 +177,8 @@ const FileAccess = () => {
                 </div>
 
                 {/* Access List */}
-                <div className="max-h-96 overflow-y-auto">
-                  <h3 className="font-bold text-gray-800 mb-4">Users with Access</h3>
+                <div>
+                  <h3 className="font-bold text-gray-800 mb-2">Users with Access</h3>
                   {(() => {
                     // Get uploader user object
                     const uploader = users.find(u => u.id === selectedFile.uploadedBy);
@@ -278,15 +277,14 @@ const FileAccess = () => {
                 </div>
               </div>
             ) : (
-              <div className="bg-white rounded-lg shadow-lg p-8 text-center overflow-hidden">
+              <div className="bg-white rounded-lg shadow-lg p-3 text-center">
                 <p className="text-gray-500 text-lg">Select a file to manage access</p>
               </div>
             )}
           </div>
         </div>
       </div>
-    </div>
-  );
-};
-
-export default FileAccess;
+    );
+  };
+  
+  export default FileAccess;

@@ -118,6 +118,15 @@
       "uploadedAt": "2025-12-17T04:57:53.585Z",
       "filesize": 455210758,
       "description": "434 MB"
+    },
+    {
+      "id": 11,
+      "filename": "1765966272826-790250951.pdf",
+      "originalname": "Water Chiller.pdf",
+      "uploadedBy": 1,
+      "uploadedAt": "2025-12-17T10:11:28.329Z",
+      "filesize": 455210758,
+      "description": "434 MB"
     }
   ],
   "file_downloads": [
@@ -444,6 +453,12 @@
       "fileId": 10,
       "userId": 1,
       "downloadedAt": "2025-12-17T09:41:09.040Z"
+    },
+    {
+      "id": 56,
+      "fileId": 10,
+      "userId": 1,
+      "downloadedAt": "2025-12-17T10:04:09.784Z"
     }
   ],
   "user_permissions": [
@@ -528,13 +543,37 @@
       "fileId": 10,
       "userId": 4,
       "grantedAt": "2025-12-17T04:58:12.963Z"
+    },
+    {
+      "id": 8,
+      "fileId": 8,
+      "userId": 2,
+      "grantedAt": "2025-12-17T10:02:50.059Z"
+    },
+    {
+      "id": 9,
+      "fileId": 9,
+      "userId": 3,
+      "grantedAt": "2025-12-17T10:02:56.030Z"
+    },
+    {
+      "id": 10,
+      "fileId": 11,
+      "userId": 5,
+      "grantedAt": "2025-12-17T10:22:28.891Z"
+    },
+    {
+      "id": 11,
+      "fileId": 11,
+      "userId": 2,
+      "grantedAt": "2025-12-17T10:22:39.536Z"
     }
   ],
   "nextIds": {
     "users": 6,
-    "files": 11,
-    "file_downloads": 56,
+    "files": 12,
+    "file_downloads": 57,
     "user_permissions": 6,
-    "file_access": 8
+    "file_access": 12
   }
 }

@@ -32,6 +32,15 @@ const Dashboard = () => {
     }
   };
 
+  const getGrantedLabel = (file) => {
+    // If file has granted users, show them
+    if (file.grantedUsernames && file.grantedUsernames.length > 0) {
+      return file.grantedUsernames.join(', ');
+    }
+    // Default to uploader
+    return file.username;
+  };
+
   const formatFileSize = (bytes) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -167,7 +176,7 @@ const Dashboard = () => {
               )}
 
               <p className="text-xs text-gray-500 mb-4">
-                Uploaded by: <strong>{file.username}</strong>
+                Granted: <strong>{getGrantedLabel(file)}</strong>
               </p>
 
               {downloadingId === file.id && (
@@ -218,7 +227,7 @@ const Dashboard = () => {
               <tr>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Filename</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Size</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Uploaded By</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Granted</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Description</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Actions</th>
               </tr>
@@ -236,7 +245,7 @@ const Dashboard = () => {
                     {(file.filesize / 1024).toFixed(2)} KB
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">
-                    {file.username}
+                    {getGrantedLabel(file)}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">
                     {file.description || '-'}

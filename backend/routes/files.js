@@ -75,7 +75,25 @@ router.get('/', auth, (req, res) => {
     // Filter files based on user access
     const accessibleFiles = files.filter(file => hasFileAccess(file, req.userId, req.userRole));
 
-    res.json(accessibleFiles);
+    // Add grantedUsers list for each file
+    const enrichedFiles = accessibleFiles.map(file => {
+      const grantedUsers = db.prepare(`
+        SELECT u.username FROM file_access fa
+        JOIN users u ON fa.userId = u.id
+        WHERE fa.fileId = ?
+        ORDER BY u.username
+      `).all(file.id);
+      
+      const grantedUsernames = grantedUsers.map(u => u.username);
+      
+      return { 
+        ...file, 
+        grantedUsernames, 
+        uploadedById: file.uploadedBy 
+      };
+    });
+
+    res.json(enrichedFiles);
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch files', error: error.message });
   }
