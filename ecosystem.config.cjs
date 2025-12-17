@@ -22,7 +22,7 @@ module.exports = {
     },
     {
       name: 'file-manager-frontend',
-      script: process.platform === 'win32' ? './start-frontend.bat' : './start-frontend.sh',
+      script: './start-frontend.js',
       cwd: './',
       instances: 1,
       exec_mode: 'fork',
