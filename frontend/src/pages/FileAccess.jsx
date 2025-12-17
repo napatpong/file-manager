@@ -99,7 +99,7 @@ const FileAccess = () => {
   if (loading) return <div className="text-center py-8">Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+    <div className="bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
           <FiKey className="text-3xl text-blue-600" />
