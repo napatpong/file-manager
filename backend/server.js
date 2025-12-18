@@ -18,6 +18,7 @@ import db from './database/init.js';
 import authRoutes from './routes/auth.js';
 import fileRoutes from './routes/files.js';
 import userRoutes from './routes/users.js';
+import chunkedUploadRoutes from './routes/chunked-upload.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -62,6 +63,7 @@ app.use(express.urlencoded({ limit: '1gb', extended: true }));
 app.use('/api/auth', authRoutes);
 app.use('/api/files', fileRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/files/upload', chunkedUploadRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

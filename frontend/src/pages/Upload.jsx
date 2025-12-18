@@ -42,21 +42,49 @@ const Upload = () => {
     setUploadedBytes(0);
     setTotalBytes(file.size);
 
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('description', description);
-
     try {
-      await axios.post(`${API_URL}/files/upload`, formData, {
+      const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB chunks
+      const fileId = Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+      const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+      let uploadedChunks = 0;
+
+      // Upload chunks
+      for (let i = 0; i < totalChunks; i++) {
+        const start = i * CHUNK_SIZE;
+        const end = Math.min(start + CHUNK_SIZE, file.size);
+        const chunk = file.slice(start, end);
+
+        const chunkFormData = new FormData();
+        chunkFormData.append('chunk', chunk);
+        chunkFormData.append('fileId', fileId);
+        chunkFormData.append('chunkNumber', i);
+        chunkFormData.append('totalChunks', totalChunks);
+
+        await axios.post(`${API_URL}/chunk`, chunkFormData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+
+        uploadedChunks++;
+        const progress = Math.round((uploadedChunks / totalChunks) * 100);
+        setUploadProgress(progress);
+        setUploadedBytes(uploadedChunks * CHUNK_SIZE);
+      }
+
+      // Finalize upload
+      const finalizeData = {
+        fileId,
+        fileName: file.name,
+        totalChunks,
+        description
+      };
+
+      await axios.post(`${API_URL}/finalize`, finalizeData, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
-        },
-        onUploadProgress: (progressEvent) => {
-          const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
-          setUploadProgress(progress);
-          setUploadedBytes(progressEvent.loaded);
-          setTotalBytes(progressEvent.total);
+          'Content-Type': 'application/json'
         }
       });
 
