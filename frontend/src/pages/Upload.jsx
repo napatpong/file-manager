@@ -77,7 +77,11 @@ const Upload = () => {
 
     try {
       // Use direct backend URL for uploads to bypass Cloudflare Worker 100MB limit
-      await axios.post(`${DIRECT_BACKEND_URL}/files/upload`, formData, {
+      console.log('Starting upload to:', `${DIRECT_BACKEND_URL}/files/upload`);
+      console.log('File size:', file.size, 'bytes');
+      console.log('Token:', token ? 'Present' : 'Missing');
+      
+      const response = await axios.post(`${DIRECT_BACKEND_URL}/files/upload`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -85,12 +89,14 @@ const Upload = () => {
         timeout: 3600000, // 1 hour timeout for large files
         onUploadProgress: (progressEvent) => {
           const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+          console.log('Upload progress:', progress, '%', progressEvent.loaded, '/', progressEvent.total);
           setUploadProgress(progress);
           setUploadedBytes(progressEvent.loaded);
           setTotalBytes(progressEvent.total);
         }
       });
 
+      console.log('Upload response:', response.data);
       setSuccess('File uploaded successfully!');
       setFile(null);
       setDescription('');
@@ -99,12 +105,19 @@ const Upload = () => {
       setTotalBytes(0);
       document.getElementById('fileInput').value = '';
     } catch (err) {
+      console.error('Upload error:', err);
+      console.error('Error response:', err.response?.data);
+      console.error('Error status:', err.response?.status);
+      console.error('Error code:', err.code);
+      
       if (err.response?.status === 413) {
         setError('File is too large. Maximum file size is 2 GB.');
       } else if (err.code === 'ECONNABORTED') {
         setError('Upload timeout. Please try again or contact administrator.');
+      } else if (err.code === 'ERR_NETWORK') {
+        setError('Network error. Please check your connection or try accepting the SSL certificate.');
       } else {
-        setError(err.response?.data?.message || 'Upload failed');
+        setError(err.response?.data?.message || err.message || 'Upload failed');
       }
     } finally {
       setLoading(false);
