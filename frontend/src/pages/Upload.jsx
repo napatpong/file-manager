@@ -14,15 +14,20 @@ const Upload = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadedBytes, setUploadedBytes] = useState(0);
   const [totalBytes, setTotalBytes] = useState(0);
-  const [certAccepted, setCertAccepted] = useState(false);
+  const [certAccepted, setCertAccepted] = useState(null); // null = checking, true = accepted, false = not accepted
 
   // Check if backend certificate is accessible
   React.useEffect(() => {
     const checkBackendAccess = async () => {
       try {
-        await axios.get(`${DIRECT_BACKEND_URL}/health`, { timeout: 5000 });
+        const response = await axios.get(`${DIRECT_BACKEND_URL}/health`, { 
+          timeout: 5000,
+          validateStatus: () => true // Accept any status code
+        });
+        console.log('Backend SSL check:', response.status);
         setCertAccepted(true);
       } catch (err) {
+        console.log('Backend SSL not accessible:', err.message);
         // Certificate not accepted yet or backend not accessible
         setCertAccepted(false);
       }
@@ -110,7 +115,7 @@ const Upload = () => {
     <div className="max-w-2xl mx-auto p-6">
       <h1 className="text-4xl font-bold text-gray-800 mb-8">Upload File</h1>
 
-      {!certAccepted && (
+      {certAccepted === false && (
         <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded mb-4">
           <p className="font-semibold mb-2">⚠️ SSL Certificate Required</p>
           <p className="mb-3">
