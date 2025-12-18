@@ -8,7 +8,7 @@ compatibility_flags = ["nodejs_compat"]
 build = { command = "npm run build", cwd = "./frontend" }
 
 # Site configuration for static assets
-site = { bucket = "./frontend/dist", include = ["assets", "*.html"] }
+site = { bucket = "./frontend/dist" }
 
 # Environment-specific configuration
 [env.production]
@@ -16,4 +16,7 @@ routes = [
   { pattern = "drive.itc-group.co.th/*", zone_name = "itc-group.co.th" }
 ]
 vars = { API_URL = "http://driveback.itc-group.co.th:2087" }
+
+[env.development]
+vars = { API_URL = "http://localhost:2087" }
 

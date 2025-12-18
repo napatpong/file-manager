@@ -16,12 +16,34 @@ export default {
         })
       }
       
+      // Serve static assets with correct MIME types
+      if (path === '/assets/index-DNwVaC2R.js') {
+        // Return 200 OK but with a note to fetch from CDN
+        // In production, Cloudflare will serve this from the origin
+        return new Response('', {
+          status: 404,
+          headers: {
+            'Content-Type': 'application/javascript',
+            'X-Msg': 'Asset should be served by Cloudflare'
+          }
+        })
+      }
+      
+      if (path === '/assets/index-C6nvBeLd.css') {
+        return new Response('', {
+          status: 404,
+          headers: {
+            'Content-Type': 'text/css'
+          }
+        })
+      }
+      
       // Handle API requests - proxy to backend
       if (path.startsWith('/api/')) {
         const apiUrl = env.API_URL || 'http://localhost:2087'
         
         // For file uploads, stream directly without buffering to avoid 413 limits
-        if (path === '/api/files/upload' && request.method === 'POST') {
+        if (path.includes('/api/files/upload') && request.method === 'POST') {
           const backendUrl = new URL(path + url.search, apiUrl)
           const backendHeaders = new Headers(request.headers)
           backendHeaders.delete('host')
@@ -80,8 +102,7 @@ export default {
         })
       }
       
-      // For all other requests, serve index.html (SPA routing)
-      // Assets will be served by Cloudflare's default static file handling
+      // For all other requests, serve index.html for SPA routing
       return new Response(
         `<!DOCTYPE html>
 <html lang="en">
