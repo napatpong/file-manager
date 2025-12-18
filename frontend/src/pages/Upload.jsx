@@ -70,7 +70,9 @@ const Upload = () => {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
         },
-        timeout: 3600000, // 1 hour timeout for large files
+        timeout: 600000, // 10 minutes timeout
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity,
         onUploadProgress: (progressEvent) => {
           const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
           console.log('Upload progress:', progress, '%', progressEvent.loaded, '/', progressEvent.total);
