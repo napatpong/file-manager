@@ -49,10 +49,12 @@ const Upload = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('=== UPLOAD STARTED ===');
     setError('');
     setSuccess('');
 
     if (!file) {
+      console.log('No file selected');
       setError('Please select a file');
       return;
     }
