@@ -1,5 +1,3 @@
-import { getAssetFromKV } from '@cloudflare/kv-asset-handler'
-
 export default {
   async fetch(request, env, ctx) {
     try {
@@ -82,32 +80,29 @@ export default {
         })
       }
       
-      // Handle static assets and SPA routing with __STATIC_CONTENT binding
-      try {
-        const asset = await getAssetFromKV({
-          request,
-          waitUntil: ctx.waitUntil
-        })
-        
-        return asset
-      } catch (err) {
-        // Not a static asset, check if it's a route for SPA
-        // Return index.html for SPA routing (all non-API, non-asset routes)
-        try {
-          const indexRequest = new Request(new URL('/index.html', request.url).toString(), {
-            method: 'GET'
-          })
-          
-          const indexAsset = await getAssetFromKV({
-            request: indexRequest,
-            waitUntil: ctx.waitUntil
-          })
-          
-          return indexAsset
-        } catch (indexErr) {
-          return new Response('Not found', { status: 404 })
+      // For all other requests, serve index.html (SPA routing)
+      // Assets will be served by Cloudflare's default static file handling
+      return new Response(
+        `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File Manager</title>
+    <script type="module" crossorigin src="/assets/index-DNwVaC2R.js"><\/script>
+    <link rel="stylesheet" crossorigin href="/assets/index-C6nvBeLd.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>`,
+        {
+          headers: {
+            'Content-Type': 'text/html; charset=utf-8',
+            'Cache-Control': 'no-cache, no-store, must-revalidate'
+          }
         }
-      }
+      )
     } catch (error) {
       return new Response('Internal Server Error: ' + error.message, {
         status: 500,
