@@ -9,12 +9,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Load environment variables FIRST before importing routes
-// First load .env.production or .env based on NODE_ENV
+// Load .env.production or .env based on NODE_ENV
 const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env';
 dotenv.config({ path: path.join(__dirname, envFile) });
-
-// Then load .env to override/supplement with local values
-dotenv.config({ path: path.join(__dirname, '.env') });
 
 // Now import other modules after env is loaded
 import db from './database/init.js';
