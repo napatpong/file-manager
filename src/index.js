@@ -25,10 +25,12 @@ export default {
         const backendHeaders = new Headers(request.headers)
         backendHeaders.delete('host')
         
+        // For large file uploads, use clone and stream the body
+        const clonedRequest = request.clone()
         const response = await fetch(backendUrl.toString(), {
           method: request.method,
           headers: backendHeaders,
-          body: request.method !== 'GET' && request.method !== 'HEAD' ? request.body : undefined
+          body: request.method !== 'GET' && request.method !== 'HEAD' ? clonedRequest.body : undefined
         })
         
         // Add CORS headers to response

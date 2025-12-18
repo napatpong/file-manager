@@ -47,12 +47,7 @@ const Upload = () => {
     formData.append('description', description);
 
     try {
-      // For file uploads, bypass worker and go directly to backend to avoid 413 limits
-      const backendUrl = window.location.hostname.includes('drive.itc-group.co.th') 
-        ? 'http://driveback.itc-group.co.th:2087'
-        : API_URL;
-      
-      await axios.post(`${backendUrl}/api/files/upload`, formData, {
+      await axios.post(`${API_URL}/files/upload`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
