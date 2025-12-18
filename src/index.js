@@ -64,7 +64,7 @@ export default {
           return new Response(asset, {
             headers: {
               'Content-Type': contentType,
-              'Cache-Control': filePath.includes('/assets/') ? 'public, max-age=31536000, immutable' : 'public, max-age=3600'
+              'Cache-Control': filePath.endsWith('.js') || filePath.endsWith('.css') ? 'public, max-age=0, must-revalidate' : filePath.includes('/assets/') ? 'public, max-age=31536000, immutable' : 'public, max-age=3600'
             }
           })
         }
