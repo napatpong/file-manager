@@ -77,22 +77,47 @@ export const db = {
       }
       if (sql.includes('INSERT INTO files')) {
         const id = storage.nextIds.files++;
-        // Support both old schema (filename, originalname) and new schema (file_name, file_path)
-        const file = {
-          id,
-          user_id: params[0], // userId
-          file_name: params[1], // fileName
-          file_path: params[2], // filePath
-          file_size: params[3], // fileSize
-          description: params[4] || '',
-          // Also keep old field names for backwards compatibility
-          filename: params[2], // filePath (old name)
-          originalname: params[1], // fileName (old name)
-          uploadedBy: params[0], // userId (old name)
-          uploadedAt: new Date().toISOString(),
-          filesize: params[3] // fileSize (old name)
-        };
-        storage.files.push(file);
+        
+        // Detect schema based on column names in SQL
+        // Old schema: INSERT INTO files (filename, originalname, uploadedBy, filesize, description)
+        // New schema: INSERT INTO files (user_id, file_name, file_path, file_size, description)
+        
+        if (sql.includes('user_id')) {
+          // New schema
+          const file = {
+            id,
+            user_id: params[0], // userId
+            file_name: params[1], // fileName
+            file_path: params[2], // filePath
+            file_size: params[3], // fileSize
+            description: params[4] || '',
+            // Also keep old field names for backwards compatibility
+            filename: params[2], // filePath (old name)
+            originalname: params[1], // fileName (old name)
+            uploadedBy: params[0], // userId (old name)
+            uploadedAt: new Date().toISOString(),
+            filesize: params[3] // fileSize (old name)
+          };
+          storage.files.push(file);
+        } else {
+          // Old schema: (filename, originalname, uploadedBy, filesize, description)
+          const file = {
+            id,
+            filename: params[0], // filename on disk
+            originalname: params[1], // original filename
+            uploadedBy: params[2], // userId
+            uploadedAt: new Date().toISOString(),
+            filesize: params[3], // file size
+            description: params[4] || '',
+            // Also map to new field names
+            file_path: params[0], // filename
+            file_name: params[1], // originalname
+            user_id: params[2], // uploadedBy
+            file_size: params[3] // filesize
+          };
+          storage.files.push(file);
+        }
+        
         saveStorage();
         return { lastInsertRowid: id };
       }
