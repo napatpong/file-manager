@@ -97,7 +97,7 @@ export default {
           )
           return asset
         } catch (err) {
-          // Asset not found - return 404 for asset requests, don't fall through to index.html
+          // Asset not found
           return new Response('Asset not found: ' + err.message, { 
             status: 404,
             headers: { 'Content-Type': 'text/plain' }
