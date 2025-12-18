@@ -1,0 +1,3 @@
+sudo openssl req -new -nodes -out itc.in.th.csr -newkey rsa:4096 -keyout itc.in.th.key -config itc.in.th.conf
+sudo openssl req -x509 -nodes -days 7305 -key itc.in.th.key -out itc.in.th.crt -config itc.in.th.conf
+

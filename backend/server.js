@@ -1,4 +1,6 @@
 import express from 'express';
+import https from 'https';
+import fs from 'fs';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
@@ -83,12 +85,36 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Internal server error', error: err.message });
 });
 
-const server = app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-  console.log(`Database initialized at ${process.env.DATABASE_PATH}`);
-  console.log(`📁 Upload directory: ${process.env.UPLOAD_DIR || './uploads'}`);
-  console.log(`🔧 Environment: ${process.env.NODE_ENV}`);
-});
+// Check if SSL certificates exist
+const sslKeyPath = path.join(__dirname, 'ssl', 'driveback.key');
+const sslCertPath = path.join(__dirname, 'ssl', 'driveback.crt');
+const useSSL = fs.existsSync(sslKeyPath) && fs.existsSync(sslCertPath);
+
+let server;
+if (useSSL) {
+  // HTTPS server with self-signed certificate
+  const httpsOptions = {
+    key: fs.readFileSync(sslKeyPath),
+    cert: fs.readFileSync(sslCertPath)
+  };
+  
+  server = https.createServer(httpsOptions, app).listen(PORT, () => {
+    console.log(`🔒 HTTPS Server is running on port ${PORT}`);
+    console.log(`Database initialized at ${process.env.DATABASE_PATH}`);
+    console.log(`📁 Upload directory: ${process.env.UPLOAD_DIR || './uploads'}`);
+    console.log(`🔧 Environment: ${process.env.NODE_ENV}`);
+    console.log(`⚠️  Using self-signed certificate`);
+  });
+} else {
+  // HTTP server (fallback)
+  server = app.listen(PORT, () => {
+    console.log(`⚠️  HTTP Server is running on port ${PORT} (SSL certificates not found)`);
+    console.log(`Database initialized at ${process.env.DATABASE_PATH}`);
+    console.log(`📁 Upload directory: ${process.env.UPLOAD_DIR || './uploads'}`);
+    console.log(`🔧 Environment: ${process.env.NODE_ENV}`);
+    console.log(`💡 To enable HTTPS, run: npm run generate-ssl`);
+  });
+}
 
 // Set timeout for large file uploads (10 minutes)
 server.setTimeout(600000);
