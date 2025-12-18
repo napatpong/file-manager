@@ -5,8 +5,11 @@ import { FiUploadCloud, FiCheck } from 'react-icons/fi';
 import API_URL, { DIRECT_BACKEND_URL } from '../config/api.js';
 
 const Upload = () => {
-  // Test log to verify component is loading
-  console.warn('🔴 UPLOAD COMPONENT LOADED');
+  // Test alert to verify component is loading
+  if (typeof window !== 'undefined' && !window.__uploadComponentLoaded) {
+    window.__uploadComponentLoaded = true;
+    alert('✅ UPLOAD COMPONENT LOADED - Logs are working!');
+  }
   
   const { token } = useAuth();
   const [file, setFile] = useState(null);
