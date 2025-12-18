@@ -1,16 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { FiUploadCloud, FiCheck } from 'react-icons/fi';
 import API_URL, { DIRECT_BACKEND_URL } from '../config/api.js';
 
 const Upload = () => {
-  // Test alert to verify component is loading
-  if (typeof window !== 'undefined' && !window.__uploadComponentLoaded) {
-    window.__uploadComponentLoaded = true;
-    alert('✅ UPLOAD COMPONENT LOADED - Logs are working!');
-  }
-  
   const { token } = useAuth();
   const [file, setFile] = useState(null);
   const [description, setDescription] = useState('');
@@ -20,6 +14,12 @@ const Upload = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadedBytes, setUploadedBytes] = useState(0);
   const [totalBytes, setTotalBytes] = useState(0);
+
+  // Test component mount
+  useEffect(() => {
+    console.error('🔴 UPLOAD COMPONENT MOUNTED - Testing Large File Upload');
+    console.error('Token:', token ? 'EXISTS' : 'MISSING');
+  }, []);
 
   // No SSL certificate check needed anymore - using Worker proxy
 
@@ -76,6 +76,9 @@ const Upload = () => {
 
       console.warn('🚀 Calling axios.post...');
 
+      let lastProgressTime = Date.now();
+      let lastProgressBytes = 0;
+
       const response = await axios.post(`${DIRECT_BACKEND_URL}/files/upload`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -86,10 +89,19 @@ const Upload = () => {
         maxBodyLength: Infinity,
         onUploadProgress: (progressEvent) => {
           const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
-          console.warn('⬆️ Upload progress:', progress, '%');
+          const now = Date.now();
+          const timeDiff = now - lastProgressTime;
+          const bytesDiff = progressEvent.loaded - lastProgressBytes;
+          const speedMBps = (bytesDiff / 1024 / 1024) / (timeDiff / 1000);
+          
+          console.error(`⬆️ ${progress}% (${(progressEvent.loaded/1024/1024).toFixed(1)}MB / ${(progressEvent.total/1024/1024).toFixed(1)}MB) - Speed: ${speedMBps.toFixed(2)} MB/s`);
+          
           setUploadProgress(progress);
           setUploadedBytes(progressEvent.loaded);
           setTotalBytes(progressEvent.total);
+          
+          lastProgressTime = now;
+          lastProgressBytes = progressEvent.loaded;
         }
       });
 

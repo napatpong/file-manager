@@ -101,39 +101,66 @@ router.get('/', auth, (req, res) => {
 });
 
 // Upload file
-router.post('/upload', auth, checkRole(['uploader', 'admin']), upload.single('file'), (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ message: 'No file uploaded' });
+router.post('/upload', auth, checkRole(['uploader', 'admin']), (req, res) => {
+  console.log('[UPLOAD] 🟢 === REQUEST RECEIVED ===');
+  console.log('[UPLOAD] 📌 User ID:', req.userId);
+  console.log('[UPLOAD] 📌 User Role:', req.userRole);
+  console.log('[UPLOAD] 📌 Headers:', {
+    contentType: req.headers['content-type'],
+    contentLength: req.headers['content-length']
+  });
+
+  // Use upload middleware and handle events
+  upload.single('file')(req, res, (err) => {
+    console.log('[UPLOAD] 🟡 Multer processing completed');
+    
+    if (err) {
+      console.error('[UPLOAD] ❌ Multer error:', err.message);
+      return res.status(400).json({ message: 'Upload error: ' + err.message });
     }
 
-    const { description } = req.body;
-    
-    // Log to check encoding
-    console.log('File uploaded:', {
-      originalname: req.file.originalname,
-      filename: req.file.filename,
-      encoding: req.file.encoding,
-      mimetype: req.file.mimetype
-    });
-
-    const result = db.prepare(`
-      INSERT INTO files (filename, originalname, uploadedBy, filesize, description)
-      VALUES (?, ?, ?, ?, ?)
-    `).run(req.file.filename, req.file.originalname, req.userId, req.file.size, description || '');
-
-    res.status(201).json({
-      message: 'File uploaded successfully',
-      file: {
-        id: result.lastInsertRowid,
-        filename: req.file.filename,
-        originalname: req.file.originalname,
-        filesize: req.file.size
+    try {
+      if (!req.file) {
+        console.error('[UPLOAD] ❌ No file in request');
+        return res.status(400).json({ message: 'No file uploaded' });
       }
-    });
-  } catch (error) {
-    res.status(500).json({ message: 'Upload failed', error: error.message });
-  }
+
+      console.log('[UPLOAD] ✅ File received by multer:', {
+        originalname: req.file.originalname,
+        filename: req.file.filename,
+        encoding: req.file.encoding,
+        mimetype: req.file.mimetype,
+        size: req.file.size,
+        sizeInMB: (req.file.size / 1024 / 1024).toFixed(2) + ' MB'
+      });
+
+      const { description } = req.body;
+      console.log('[UPLOAD] 💾 Saving to database...');
+      
+      const result = db.prepare(`
+        INSERT INTO files (filename, originalname, uploadedBy, filesize, description)
+        VALUES (?, ?, ?, ?, ?)
+      `).run(req.file.filename, req.file.originalname, req.userId, req.file.size, description || '');
+
+      console.log('[UPLOAD] ✅ Database saved, File ID:', result.lastInsertRowid);
+      console.log('[UPLOAD] 🟢 === UPLOAD SUCCESS ===');
+
+      res.status(201).json({
+        message: 'File uploaded successfully',
+        file: {
+          id: result.lastInsertRowid,
+          filename: req.file.filename,
+          originalname: req.file.originalname,
+          filesize: req.file.size
+        }
+      });
+    } catch (error) {
+      console.error('[UPLOAD] ❌ === UPLOAD FAILED ===');
+      console.error('[UPLOAD] Error:', error.message);
+      console.error('[UPLOAD] Stack:', error.stack);
+      res.status(500).json({ message: 'Upload failed', error: error.message });
+    }
+  });
 });
 
 // Download file (check access first)
