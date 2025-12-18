@@ -5,8 +5,8 @@ const isCloudflare = typeof window !== 'undefined' && window.location.hostname.i
 
 let API_URL
 if (isCloudflare) {
-  // Use same origin (worker proxies to backend)
-  API_URL = `${window.location.protocol}//${window.location.hostname}`
+  // Use same origin with port 2087
+  API_URL = `${window.location.protocol}//${window.location.hostname}:2087`
 } else {
   // Use environment variable
   if (import.meta.env.VITE_API_URL) {
@@ -16,7 +16,7 @@ if (isCloudflare) {
     if (typeof window !== 'undefined') {
       const hostname = window.location.hostname
       // For domain access, try to use 172.16.0.22 as fallback
-      const isDomain = hostname.includes('itc.in.th') || hostname.includes('.')
+      const isDomain = hostname.includes('itc.in.th') || hostname.includes('itc-group.co.th') || hostname.includes('.')
       if (isDomain && hostname !== '172.16.0.22') {
         // Try domain first, but have IP as fallback
         API_URL = `${window.location.protocol}//${hostname}:2087`
@@ -25,7 +25,7 @@ if (isCloudflare) {
       }
     } else {
       // Fallback for SSR
-      API_URL = 'http://drive.itc.in.th:2087'
+      API_URL = 'http://drive.itc-group.co.th:2087'
     }
   }
 }
