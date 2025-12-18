@@ -80,44 +80,23 @@ export default {
         })
       }
       
-      // Handle static assets from KV
+      // Serve static assets by proxying to origin or falling back to index.html for SPA
+      // Since KV is empty, serve from default static asset handler
       let filePath = path === '/' ? '/index.html' : path
       
-      try {
-        const asset = await env.drive_manager.get(filePath, { type: 'arrayBuffer' })
-        
-        if (asset) {
-          let contentType = 'application/octet-stream'
-          if (filePath.endsWith('.html')) contentType = 'text/html; charset=utf-8'
-          else if (filePath.endsWith('.css')) contentType = 'text/css'
-          else if (filePath.endsWith('.js')) contentType = 'application/javascript'
-          else if (filePath.endsWith('.json')) contentType = 'application/json'
-          else if (filePath.endsWith('.png')) contentType = 'image/png'
-          else if (filePath.endsWith('.jpg') || filePath.endsWith('.jpeg')) contentType = 'image/jpeg'
-          else if (filePath.endsWith('.svg')) contentType = 'image/svg+xml'
-          else if (filePath.endsWith('.woff')) contentType = 'font/woff'
-          else if (filePath.endsWith('.woff2')) contentType = 'font/woff2'
-          
-          return new Response(asset, {
-            headers: {
-              'Content-Type': contentType,
-              'Cache-Control': filePath.includes('/assets/') ? 'public, max-age=31536000, immutable' : 'public, max-age=3600'
-            }
-          })
-        }
-      } catch (err) {
-        // File not found, will return index.html
+      // Default Cloudflare behavior will serve from local assets
+      // For non-API paths, try to serve static files, then fall back to index.html for SPA routing
+      const staticExtensions = ['.js', '.css', '.png', '.jpg', '.jpeg', '.svg', '.woff', '.woff2', '.json', '.map']
+      const isStaticFile = staticExtensions.some(ext => filePath.endsWith(ext))
+      
+      if (isStaticFile) {
+        // Let Cloudflare serve static files from the deployment
+        return fetch(request)
       }
       
-      // Return index.html for SPA routing on all unknown paths
+      // For SPA routing, return index.html for unknown routes
       try {
-        const indexHtml = await env.drive_manager.get('/index.html', { type: 'text' })
-        return new Response(indexHtml, {
-          headers: {
-            'Content-Type': 'text/html; charset=utf-8',
-            'Cache-Control': 'no-cache, no-store, must-revalidate'
-          }
-        })
+        return fetch(new Request(url.origin + '/index.html', { method: 'GET' }))
       } catch (err) {
         return new Response('Not found', { status: 404 })
       }
