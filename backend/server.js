@@ -86,8 +86,8 @@ app.use((err, req, res, next) => {
 });
 
 // Check if SSL certificates exist
-const sslKeyPath = path.join(__dirname, 'ssl', 'driveback.key');
-const sslCertPath = path.join(__dirname, 'ssl', 'driveback.crt');
+const sslKeyPath = path.join(__dirname, '..', 'ssl', 'itc.in.th.key');
+const sslCertPath = path.join(__dirname, '..', 'ssl', 'itc.in.th.crt');
 const useSSL = fs.existsSync(sslKeyPath) && fs.existsSync(sslCertPath);
 
 let server;
