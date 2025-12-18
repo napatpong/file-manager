@@ -10,7 +10,8 @@ module.exports = {
         NODE_ENV: 'production',
         PORT: 2087,
         JWT_SECRET: 'your_jwt_secret_key_change_in_production',
-        JWT_EXPIRES_IN: '7d'
+        JWT_EXPIRES_IN: '7d',
+        UPLOAD_DIR: '/var/www/www.itc.in.th/downloads'
       },
       error_file: './logs/backend-error.log',
       out_file: './logs/backend-out.log',
