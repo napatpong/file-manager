@@ -131,3 +131,5 @@ if (useSSL) {
 
 // Set timeout for large file uploads (10 minutes)
 server.setTimeout(600000);
+server.keepAliveTimeout = 600000;
+server.headersTimeout = 700000;

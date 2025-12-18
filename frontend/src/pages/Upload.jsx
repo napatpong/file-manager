@@ -39,12 +39,12 @@ const Upload = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.warn('✅ === UPLOAD FORM SUBMITTED ===');
+    console.error('✅ === UPLOAD FORM SUBMITTED ===');
     setError('');
     setSuccess('');
 
     if (!file) {
-      console.warn('❌ No file selected');
+      console.error('❌ No file selected');
       setError('Please select a file');
       return;
     }
@@ -64,78 +64,130 @@ const Upload = () => {
     setTotalBytes(file.size);
 
     try {
-      // Upload via direct backend HTTPS URL for large files
-      console.warn('📤 Starting upload to:', `${DIRECT_BACKEND_URL}/files/upload`);
-      console.warn('📊 File size:', file.size, 'bytes');
-      console.warn('🔐 Token:', token ? 'Present' : 'Missing');
-      console.warn('📦 FormData created, about to send...');
-      
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('description', description);
-
-      console.warn('🚀 Calling axios.post...');
-
-      let lastProgressTime = Date.now();
-      let lastProgressBytes = 0;
-
-      const response = await axios.post(`${DIRECT_BACKEND_URL}/files/upload`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
-        },
-        timeout: 600000,
-        maxContentLength: Infinity,
-        maxBodyLength: Infinity,
-        onUploadProgress: (progressEvent) => {
-          const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
-          const now = Date.now();
-          const timeDiff = now - lastProgressTime;
-          const bytesDiff = progressEvent.loaded - lastProgressBytes;
-          const speedMBps = (bytesDiff / 1024 / 1024) / (timeDiff / 1000);
-          
-          console.error(`⬆️ ${progress}% (${(progressEvent.loaded/1024/1024).toFixed(1)}MB / ${(progressEvent.total/1024/1024).toFixed(1)}MB) - Speed: ${speedMBps.toFixed(2)} MB/s`);
-          
-          setUploadProgress(progress);
-          setUploadedBytes(progressEvent.loaded);
-          setTotalBytes(progressEvent.total);
-          
-          lastProgressTime = now;
-          lastProgressBytes = progressEvent.loaded;
-        }
-      });
-
-      console.warn('✅ Upload successful! Response:', response.data);
-      setSuccess('File uploaded successfully!');
-      setFile(null);
-      setDescription('');
-      setUploadProgress(0);
-      setUploadedBytes(0);
-      setTotalBytes(0);
-      document.getElementById('fileInput').value = '';
-    } catch (err) {
-      console.error('❌ === UPLOAD ERROR ===');
-      console.error('Error message:', err.message);
-      console.error('Error code:', err.code);
-      console.error('Error response:', err.response?.data);
-      console.error('Error status:', err.response?.status);
-      console.error('Full error:', err);
-      
-      if (err.response?.status === 413) {
-        setError('File is too large. Maximum file size is 2 GB.');
-      } else if (err.code === 'ECONNABORTED') {
-        setError('Upload timeout. Please try again with a smaller file.');
-      } else if (err.code === 'ERR_NETWORK') {
-        setError('Network error. Please check your connection.');
-      } else if (err.code === 'ERR_BAD_REQUEST') {
-        setError('Bad request. File might be too large.');
+      // Use chunked upload for files > 100MB
+      if (file.size > 100 * 1024 * 1024) {
+        console.error('📦 File > 100MB, using chunked upload');
+        await uploadChunked();
       } else {
-        setError(err.response?.data?.message || err.message || 'Upload failed');
+        console.error('📦 File < 100MB, using single upload');
+        await uploadSingle();
       }
+    } catch (error) {
+      console.error('❌ === UPLOAD FAILED ===');
+      console.error('Error:', error.message);
+      setError(error.message || 'Upload failed');
     } finally {
       setLoading(false);
-      console.warn('✅ Upload handler finished');
     }
+  };
+
+  const uploadSingle = async () => {
+    // Original single upload method
+    console.error('🚀 Starting single file upload');
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('description', description);
+
+    let lastProgressTime = Date.now();
+    let lastProgressBytes = 0;
+
+    const response = await axios.post(`${DIRECT_BACKEND_URL}/files/upload`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data'
+      },
+      timeout: 600000,
+      maxContentLength: Infinity,
+      maxBodyLength: Infinity,
+      onUploadProgress: (progressEvent) => {
+        const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+        const now = Date.now();
+        const timeDiff = now - lastProgressTime;
+        const bytesDiff = progressEvent.loaded - lastProgressBytes;
+        const speedMBps = (bytesDiff / 1024 / 1024) / (timeDiff / 1000);
+        
+        console.error(`⬆️ ${progress}% (${(progressEvent.loaded/1024/1024).toFixed(1)}MB / ${(progressEvent.total/1024/1024).toFixed(1)}MB) - Speed: ${speedMBps.toFixed(2)} MB/s`);
+        
+        setUploadProgress(progress);
+        setUploadedBytes(progressEvent.loaded);
+        setTotalBytes(progressEvent.total);
+        
+        lastProgressTime = now;
+        lastProgressBytes = progressEvent.loaded;
+      }
+    });
+
+    console.error('✅ Single upload successful!');
+    setSuccess('File uploaded successfully!');
+    setFile(null);
+    setDescription('');
+    setUploadProgress(0);
+    setUploadedBytes(0);
+    setTotalBytes(0);
+    document.getElementById('fileInput').value = '';
+  };
+
+  const uploadChunked = async () => {
+    // Chunked upload for large files
+    console.error('🔄 Starting chunked upload');
+    
+    const CHUNK_SIZE = 50 * 1024 * 1024; // 50MB chunks
+    const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+    const fileId = Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+    
+    console.error(`📦 File will be split into ${totalChunks} chunks of ${CHUNK_SIZE / 1024 / 1024}MB each`);
+
+    for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+      const start = chunkIndex * CHUNK_SIZE;
+      const end = Math.min(start + CHUNK_SIZE, file.size);
+      const chunk = file.slice(start, end);
+      
+      console.error(`📤 Uploading chunk ${chunkIndex + 1}/${totalChunks} (${(chunk.size/1024/1024).toFixed(1)}MB)`);
+
+      try {
+        const response = await axios.post(
+          `${DIRECT_BACKEND_URL}/files/upload-chunk`,
+          chunk,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/octet-stream',
+              'X-Chunk-Index': chunkIndex,
+              'X-Total-Chunks': totalChunks,
+              'X-File-Name': file.name,
+              'X-File-ID': fileId
+            },
+            timeout: 300000, // 5 minutes per chunk
+            maxContentLength: Infinity,
+            maxBodyLength: Infinity,
+            onUploadProgress: (progressEvent) => {
+              const chunkProgress = (progressEvent.loaded / chunk.size) * 100;
+              const totalProgress = ((chunkIndex * CHUNK_SIZE + progressEvent.loaded) / file.size) * 100;
+              
+              console.error(`⬆️ Chunk ${chunkIndex + 1}/${totalChunks}: ${chunkProgress.toFixed(0)}% | Total: ${totalProgress.toFixed(1)}%`);
+              
+              setUploadProgress(Math.round(totalProgress));
+              setUploadedBytes(chunkIndex * CHUNK_SIZE + progressEvent.loaded);
+            }
+          }
+        );
+
+        console.error(`✅ Chunk ${chunkIndex + 1}/${totalChunks} uploaded successfully`);
+      } catch (error) {
+        console.error(`❌ Chunk ${chunkIndex + 1} failed:`, error.message);
+        throw new Error(`Failed to upload chunk ${chunkIndex + 1}`);
+      }
+    }
+
+    console.error('✅ All chunks uploaded successfully!');
+    setSuccess('File uploaded successfully!');
+    setFile(null);
+    setDescription('');
+    setUploadProgress(0);
+    setUploadedBytes(0);
+    setTotalBytes(0);
+    document.getElementById('fileInput').value = '';
   };
 
   return (
