@@ -18,7 +18,9 @@ const Upload = () => {
   // No SSL certificate check needed anymore - using Worker proxy
 
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+    const selectedFile = e.target.files[0];
+    console.log('File selected:', selectedFile?.name, 'Size:', selectedFile?.size);
+    setFile(selectedFile);
   };
 
   const formatFileSize = (bytes) => {
@@ -60,17 +62,24 @@ const Upload = () => {
       console.log('Starting upload to:', `${DIRECT_BACKEND_URL}/files/upload`);
       console.log('File size:', file.size, 'bytes');
       console.log('Token:', token ? 'Present' : 'Missing');
+      console.log('FormData created, about to send...');
       
       const formData = new FormData();
       formData.append('file', file);
       formData.append('description', description);
+
+      console.log('Calling axios.post with config:', {
+        timeout: 600000,
+        maxContentLength: 'Infinity',
+        maxBodyLength: 'Infinity'
+      });
 
       const response = await axios.post(`${DIRECT_BACKEND_URL}/files/upload`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
         },
-        timeout: 600000, // 10 minutes timeout
+        timeout: 600000,
         maxContentLength: Infinity,
         maxBodyLength: Infinity,
         onUploadProgress: (progressEvent) => {
@@ -82,7 +91,7 @@ const Upload = () => {
         }
       });
 
-      console.log('Upload response:', response.data);
+      console.log('Upload response received:', response.data);
       setSuccess('File uploaded successfully!');
       setFile(null);
       setDescription('');
@@ -91,22 +100,27 @@ const Upload = () => {
       setTotalBytes(0);
       document.getElementById('fileInput').value = '';
     } catch (err) {
-      console.error('Upload error:', err);
+      console.error('=== UPLOAD ERROR ===');
+      console.error('Error message:', err.message);
+      console.error('Error code:', err.code);
       console.error('Error response:', err.response?.data);
       console.error('Error status:', err.response?.status);
-      console.error('Error code:', err.code);
+      console.error('Full error:', err);
       
       if (err.response?.status === 413) {
         setError('File is too large. Maximum file size is 2 GB.');
       } else if (err.code === 'ECONNABORTED') {
-        setError('Upload timeout. Please try again or contact administrator.');
+        setError('Upload timeout. Please try again with a smaller file.');
       } else if (err.code === 'ERR_NETWORK') {
         setError('Network error. Please check your connection.');
+      } else if (err.code === 'ERR_BAD_REQUEST') {
+        setError('Bad request. File might be too large.');
       } else {
         setError(err.response?.data?.message || err.message || 'Upload failed');
       }
     } finally {
       setLoading(false);
+      console.log('Upload handler finished');
     }
   };
 
