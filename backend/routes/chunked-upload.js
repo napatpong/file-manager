@@ -89,28 +89,22 @@ router.post('/finalize', auth, async (req, res) => {
         // Store file info in database
         const fileSize = fs.statSync(outputPath).size;
         
-        db.run(
+        const result = db.prepare(
           `INSERT INTO files (user_id, file_name, file_path, file_size, description)
-           VALUES (?, ?, ?, ?, ?)`,
-          [userId, fileName, outputFileName, fileSize, description || ''],
-          (err) => {
-            if (err) {
-              fs.unlinkSync(outputPath);
-              return res.status(500).json({ error: 'Database error' });
-            }
+           VALUES (?, ?, ?, ?, ?)`
+        ).run(userId, fileName, outputFileName, fileSize, description || '');
 
-            res.json({
-              success: true,
-              file: {
-                id: this.lastID,
-                name: fileName,
-                size: fileSize,
-                path: outputFileName
-              }
-            });
+        res.json({
+          success: true,
+          file: {
+            id: result.lastInsertRowid,
+            name: fileName,
+            size: fileSize,
+            path: outputFileName
           }
-        );
+        });
       } catch (err) {
+        console.error('Finalize error:', err);
         if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath);
         res.status(500).json({ error: err.message });
       }
