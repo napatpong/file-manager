@@ -14,26 +14,8 @@ const Upload = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadedBytes, setUploadedBytes] = useState(0);
   const [totalBytes, setTotalBytes] = useState(0);
-  const [certAccepted, setCertAccepted] = useState(null); // null = checking, true = accepted, false = not accepted
 
-  // Check if backend certificate is accessible
-  React.useEffect(() => {
-    const checkBackendAccess = async () => {
-      try {
-        const response = await axios.get(`${DIRECT_BACKEND_URL}/health`, { 
-          timeout: 5000,
-          validateStatus: () => true // Accept any status code
-        });
-        console.log('Backend SSL check:', response.status);
-        setCertAccepted(true);
-      } catch (err) {
-        console.log('Backend SSL not accessible:', err.message);
-        // Certificate not accepted yet or backend not accessible
-        setCertAccepted(false);
-      }
-    };
-    checkBackendAccess();
-  }, []);
+  // No SSL certificate check needed anymore - using Worker proxy
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -73,17 +55,17 @@ const Upload = () => {
     setUploadedBytes(0);
     setTotalBytes(file.size);
 
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('description', description);
-
     try {
-      // Use direct backend URL for uploads to bypass Cloudflare Worker 100MB limit
-      console.log('Starting upload to:', `${DIRECT_BACKEND_URL}/files/upload`);
+      // Upload via Worker API (handles chunking internally for large files)
+      console.log('Starting upload via Worker to:', `${API_URL}/files/upload`);
       console.log('File size:', file.size, 'bytes');
       console.log('Token:', token ? 'Present' : 'Missing');
       
-      const response = await axios.post(`${DIRECT_BACKEND_URL}/files/upload`, formData, {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('description', description);
+
+      const response = await axios.post(`${API_URL}/files/upload`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -117,7 +99,7 @@ const Upload = () => {
       } else if (err.code === 'ECONNABORTED') {
         setError('Upload timeout. Please try again or contact administrator.');
       } else if (err.code === 'ERR_NETWORK') {
-        setError('Network error. Please check your connection or try accepting the SSL certificate.');
+        setError('Network error. Please check your connection.');
       } else {
         setError(err.response?.data?.message || err.message || 'Upload failed');
       }
@@ -129,31 +111,6 @@ const Upload = () => {
   return (
     <div className="max-w-2xl mx-auto p-6">
       <h1 className="text-4xl font-bold text-gray-800 mb-8">Upload File</h1>
-
-      {certAccepted === false && (
-        <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded mb-4">
-          <p className="font-semibold mb-2">⚠️ SSL Certificate Required</p>
-          <p className="mb-3">
-            For large file uploads, you need to accept the backend SSL certificate first.
-          </p>
-          <a
-            href={`${DIRECT_BACKEND_URL}/health`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700"
-            onClick={() => {
-              setTimeout(() => {
-                window.location.reload();
-              }, 2000);
-            }}
-          >
-            Accept Certificate & Reload
-          </a>
-          <p className="text-sm mt-2">
-            Click the button above, accept the security warning in the new tab, then this page will reload.
-          </p>
-        </div>
-      )}
 
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
