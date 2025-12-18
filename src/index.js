@@ -1,4 +1,4 @@
-import { getAssetFromKV, mapRequestToAsset } from '@cloudflare/kv-asset-handler'
+import { getAssetFromKV } from '@cloudflare/kv-asset-handler'
 
 export default {
   async fetch(request, env, ctx) {
@@ -82,70 +82,30 @@ export default {
         })
       }
       
-      // Handle static assets and SPA routing
-      // Try to get static assets from KV (if populated) or return index.html for SPA
+      // Handle static assets and SPA routing with __STATIC_CONTENT binding
       try {
-        const asset = await getAssetFromKV(
-          {
-            request,
-            waitUntil: ctx.waitUntil
-          },
-          {
-            ASSET_NAMESPACE: env.drive_manager,
-            ASSET_MANIFEST: undefined,
-            cacheControl: {
-              default: 'no-cache, no-store, must-revalidate',
-              'max-age=31536000': ['js', 'css', 'png', 'jpg', 'jpeg', 'gif', 'svg', 'woff', 'woff2']
-            },
-            mapRequestToAsset: request => mapRequestToAsset(new Request(new URL(request.url).pathname === '/' ? '/index.html' : request.url, request))
-          }
-        )
+        const asset = await getAssetFromKV({
+          request,
+          waitUntil: ctx.waitUntil
+        })
         
         return asset
       } catch (err) {
-        // Fall back to serving index.html for SPA routing
+        // Not a static asset, check if it's a route for SPA
+        // Return index.html for SPA routing (all non-API, non-asset routes)
         try {
-          const indexAsset = await getAssetFromKV(
-            {
-              request: new Request(new URL('/index.html', request.url).toString(), {
-                method: 'GET',
-                headers: request.headers
-              }),
-              waitUntil: ctx.waitUntil
-            },
-            {
-              ASSET_NAMESPACE: env.drive_manager,
-              ASSET_MANIFEST: undefined,
-              cacheControl: {
-                default: 'no-cache, no-store, must-revalidate'
-              }
-            }
-          )
+          const indexRequest = new Request(new URL('/index.html', request.url).toString(), {
+            method: 'GET'
+          })
+          
+          const indexAsset = await getAssetFromKV({
+            request: indexRequest,
+            waitUntil: ctx.waitUntil
+          })
           
           return indexAsset
-        } catch (fallbackErr) {
-          // If KV is empty, serve a minimal index.html
-          return new Response(
-            `<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>File Manager</title>
-    <script type="module" crossorigin src="/assets/index-DNwVaC2R.js"><\/script>
-    <link rel="stylesheet" crossorigin href="/assets/index-C6nvBeLd.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
-</html>`,
-            {
-              headers: {
-                'Content-Type': 'text/html; charset=utf-8',
-                'Cache-Control': 'no-cache, no-store, must-revalidate'
-              }
-            }
-          )
+        } catch (indexErr) {
+          return new Response('Not found', { status: 404 })
         }
       }
     } catch (error) {

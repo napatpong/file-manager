@@ -7,6 +7,9 @@ compatibility_flags = ["nodejs_compat"]
 # Build configuration
 build = { command = "npm run build", cwd = "./frontend" }
 
+# Site configuration for static assets
+site = { bucket = "./frontend/dist" }
+
 # Environment-specific configuration
 [env.production]
 routes = [
