@@ -56,8 +56,8 @@ const Upload = () => {
     setTotalBytes(file.size);
 
     try {
-      // Upload via Worker API (handles chunking internally for large files)
-      console.log('Starting upload via Worker to:', `${API_URL}/files/upload`);
+      // Upload via direct backend HTTPS URL for large files
+      console.log('Starting upload to:', `${DIRECT_BACKEND_URL}/files/upload`);
       console.log('File size:', file.size, 'bytes');
       console.log('Token:', token ? 'Present' : 'Missing');
       
@@ -65,7 +65,7 @@ const Upload = () => {
       formData.append('file', file);
       formData.append('description', description);
 
-      const response = await axios.post(`${API_URL}/files/upload`, formData, {
+      const response = await axios.post(`${DIRECT_BACKEND_URL}/files/upload`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
