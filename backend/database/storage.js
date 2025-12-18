@@ -77,15 +77,22 @@ export const db = {
       }
       if (sql.includes('INSERT INTO files')) {
         const id = storage.nextIds.files++;
-        storage.files.push({
+        // Support both old schema (filename, originalname) and new schema (file_name, file_path)
+        const file = {
           id,
-          filename: params[0],
-          originalname: params[1],
-          uploadedBy: params[2],
+          user_id: params[0], // userId
+          file_name: params[1], // fileName
+          file_path: params[2], // filePath
+          file_size: params[3], // fileSize
+          description: params[4] || '',
+          // Also keep old field names for backwards compatibility
+          filename: params[2], // filePath (old name)
+          originalname: params[1], // fileName (old name)
+          uploadedBy: params[0], // userId (old name)
           uploadedAt: new Date().toISOString(),
-          filesize: params[3],
-          description: params[4] || ''
-        });
+          filesize: params[3] // fileSize (old name)
+        };
+        storage.files.push(file);
         saveStorage();
         return { lastInsertRowid: id };
       }
