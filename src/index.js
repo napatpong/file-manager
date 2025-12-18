@@ -85,13 +85,23 @@ export default {
       // Serve static assets from Cloudflare Workers Site (__STATIC_CONTENT binding)
       if (path.startsWith('/assets/') || path.endsWith('.css') || path.endsWith('.js') || path === '/index.html') {
         try {
-          const asset = await getAssetFromKV({
-            request,
-            waitUntil: ctx.waitUntil
-          })
+          const asset = await getAssetFromKV(
+            {
+              request,
+              waitUntil: ctx.waitUntil
+            },
+            {
+              ASSET_NAMESPACE: env.__STATIC_CONTENT,
+              ASSET_MANIFEST: undefined
+            }
+          )
           return asset
         } catch (err) {
-          // Fall through to serve index.html for non-static routes
+          // Asset not found - return 404 for asset requests, don't fall through to index.html
+          return new Response('Asset not found: ' + err.message, { 
+            status: 404,
+            headers: { 'Content-Type': 'text/plain' }
+          })
         }
       }
       
@@ -100,10 +110,16 @@ export default {
         const indexReq = new Request(new URL('/index.html', request.url).toString(), {
           method: 'GET'
         })
-        const asset = await getAssetFromKV({
-          request: indexReq,
-          waitUntil: ctx.waitUntil
-        })
+        const asset = await getAssetFromKV(
+          {
+            request: indexReq,
+            waitUntil: ctx.waitUntil
+          },
+          {
+            ASSET_NAMESPACE: env.__STATIC_CONTENT,
+            ASSET_MANIFEST: undefined
+          }
+        )
         return asset
       } catch (err) {
         // Fallback if getAssetFromKV fails
