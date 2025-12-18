@@ -1,3 +1,5 @@
+import { getAssetFromKV, mapRequestToAsset } from '@cloudflare/kv-asset-handler'
+
 export default {
   async fetch(request, env, ctx) {
     try {
@@ -80,25 +82,71 @@ export default {
         })
       }
       
-      // Serve static assets by proxying to origin or falling back to index.html for SPA
-      // Since KV is empty, serve from default static asset handler
-      let filePath = path === '/' ? '/index.html' : path
-      
-      // Default Cloudflare behavior will serve from local assets
-      // For non-API paths, try to serve static files, then fall back to index.html for SPA routing
-      const staticExtensions = ['.js', '.css', '.png', '.jpg', '.jpeg', '.svg', '.woff', '.woff2', '.json', '.map']
-      const isStaticFile = staticExtensions.some(ext => filePath.endsWith(ext))
-      
-      if (isStaticFile) {
-        // Let Cloudflare serve static files from the deployment
-        return fetch(request)
-      }
-      
-      // For SPA routing, return index.html for unknown routes
+      // Handle static assets and SPA routing
+      // Try to get static assets from KV (if populated) or return index.html for SPA
       try {
-        return fetch(new Request(url.origin + '/index.html', { method: 'GET' }))
+        const asset = await getAssetFromKV(
+          {
+            request,
+            waitUntil: ctx.waitUntil
+          },
+          {
+            ASSET_NAMESPACE: env.drive_manager,
+            ASSET_MANIFEST: undefined,
+            cacheControl: {
+              default: 'no-cache, no-store, must-revalidate',
+              'max-age=31536000': ['js', 'css', 'png', 'jpg', 'jpeg', 'gif', 'svg', 'woff', 'woff2']
+            },
+            mapRequestToAsset: request => mapRequestToAsset(new Request(new URL(request.url).pathname === '/' ? '/index.html' : request.url, request))
+          }
+        )
+        
+        return asset
       } catch (err) {
-        return new Response('Not found', { status: 404 })
+        // Fall back to serving index.html for SPA routing
+        try {
+          const indexAsset = await getAssetFromKV(
+            {
+              request: new Request(new URL('/index.html', request.url).toString(), {
+                method: 'GET',
+                headers: request.headers
+              }),
+              waitUntil: ctx.waitUntil
+            },
+            {
+              ASSET_NAMESPACE: env.drive_manager,
+              ASSET_MANIFEST: undefined,
+              cacheControl: {
+                default: 'no-cache, no-store, must-revalidate'
+              }
+            }
+          )
+          
+          return indexAsset
+        } catch (fallbackErr) {
+          // If KV is empty, serve a minimal index.html
+          return new Response(
+            `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File Manager</title>
+    <script type="module" crossorigin src="/assets/index-DNwVaC2R.js"><\/script>
+    <link rel="stylesheet" crossorigin href="/assets/index-C6nvBeLd.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>`,
+            {
+              headers: {
+                'Content-Type': 'text/html; charset=utf-8',
+                'Cache-Control': 'no-cache, no-store, must-revalidate'
+              }
+            }
+          )
+        }
       }
     } catch (error) {
       return new Response('Internal Server Error: ' + error.message, {
