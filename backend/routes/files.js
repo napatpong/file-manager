@@ -15,8 +15,10 @@ const router = express.Router();
 
 // Use UPLOAD_DIR from environment, fallback to local ./uploads
 const uploadsDir = process.env.UPLOAD_DIR || path.join(__dirname, '../uploads');
+console.log('📁 Upload Directory:', uploadsDir);
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
+  console.log('✅ Created upload directory:', uploadsDir);
 }
 
 const storage = multer.diskStorage({

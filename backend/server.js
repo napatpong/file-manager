@@ -87,6 +87,8 @@ app.use((err, req, res, next) => {
 const server = app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   console.log(`Database initialized at ${process.env.DATABASE_PATH}`);
+  console.log(`📁 Upload directory: ${process.env.UPLOAD_DIR || './uploads'}`);
+  console.log(`🔧 Environment: ${process.env.NODE_ENV}`);
 });
 
 // Set timeout for large file uploads (10 minutes)
