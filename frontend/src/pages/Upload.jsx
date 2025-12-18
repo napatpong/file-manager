@@ -37,11 +37,19 @@ const Upload = () => {
       return;
     }
 
-    // Warning for large files
+    // Check file size limit (100MB for Cloudflare Worker)
     const fileSizeMB = file.size / (1024 * 1024);
-    if (fileSizeMB > 100) {
+    const MAX_FILE_SIZE_MB = 100;
+    
+    if (fileSizeMB > MAX_FILE_SIZE_MB) {
+      setError(`File is too large (${fileSizeMB.toFixed(2)} MB). Maximum file size is ${MAX_FILE_SIZE_MB} MB. Please use a smaller file or contact administrator to enable backend SSL for larger uploads.`);
+      return;
+    }
+
+    // Warning for large files (over 50MB)
+    if (fileSizeMB > 50) {
       const confirmed = window.confirm(
-        `This file is ${fileSizeMB.toFixed(2)} MB. Large files may take a long time to upload or fail due to timeout. Continue?`
+        `This file is ${fileSizeMB.toFixed(2)} MB. Large files may take time to upload. Continue?`
       );
       if (!confirmed) {
         return;
@@ -80,7 +88,11 @@ const Upload = () => {
       setTotalBytes(0);
       document.getElementById('fileInput').value = '';
     } catch (err) {
-      setError(err.response?.data?.message || 'Upload failed');
+      if (err.response?.status === 413) {
+        setError('File is too large. Maximum file size is 100 MB through web interface.');
+      } else {
+        setError(err.response?.data?.message || 'Upload failed');
+      }
     } finally {
       setLoading(false);
     }
