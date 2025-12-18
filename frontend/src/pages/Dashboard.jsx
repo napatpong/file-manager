@@ -251,24 +251,44 @@ const Dashboard = () => {
                     {file.description || '-'}
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => handleDownload(file.id, file.originalname, file.filesize)}
-                        disabled={downloadingId === file.id}
-                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-3 rounded flex items-center space-x-1 transition disabled:opacity-50"
-                      >
-                        <FiDownload className="text-sm" />
-                        <span>{downloadingId === file.id ? 'Downloading...' : 'Download'}</span>
-                      </button>
-
-                      {(user.role === 'admin' || user.id === file.uploadedBy) && (
-                        <button
-                          onClick={() => handleDelete(file.id)}
-                          className="bg-red-600 hover:bg-red-700 text-white font-semibold py-1 px-3 rounded flex items-center justify-center transition"
-                        >
-                          <FiTrash2 />
-                        </button>
+                    <div className="flex flex-col space-y-2">
+                      {downloadingId === file.id && (
+                        <div className="w-full">
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="text-xs font-semibold text-gray-700">Downloading...</span>
+                            <span className="text-xs text-gray-600">{downloadProgress}%</span>
+                          </div>
+                          <div className="w-full bg-gray-300 rounded-full h-2 overflow-hidden">
+                            <div
+                              className="bg-gradient-to-r from-blue-500 to-blue-700 h-full transition-all duration-300"
+                              style={{ width: `${downloadProgress}%` }}
+                            />
+                          </div>
+                          <div className="flex justify-between text-xs text-gray-600 mt-1">
+                            <span>{formatFileSize(downloadedBytes)}</span>
+                            <span>{formatFileSize(totalDownloadBytes - downloadedBytes)} left</span>
+                          </div>
+                        </div>
                       )}
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => handleDownload(file.id, file.originalname, file.filesize)}
+                          disabled={downloadingId === file.id}
+                          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-3 rounded flex items-center space-x-1 transition disabled:opacity-50"
+                        >
+                          <FiDownload className="text-sm" />
+                          <span>{downloadingId === file.id ? 'Downloading...' : 'Download'}</span>
+                        </button>
+
+                        {(user.role === 'admin' || user.id === file.uploadedBy) && (
+                          <button
+                            onClick={() => handleDelete(file.id)}
+                            className="bg-red-600 hover:bg-red-700 text-white font-semibold py-1 px-3 rounded flex items-center justify-center transition"
+                          >
+                            <FiTrash2 />
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </td>
                 </tr>
