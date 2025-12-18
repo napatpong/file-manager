@@ -25,7 +25,7 @@ if (isCloudflare) {
       }
     } else {
       // Fallback for SSR
-      API_URL = 'http://localhost:2087'
+      API_URL = 'http://drive.itc.in.th:2087'
     }
   }
 }
