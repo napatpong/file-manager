@@ -37,6 +37,17 @@ const Upload = () => {
       return;
     }
 
+    // Warning for large files
+    const fileSizeMB = file.size / (1024 * 1024);
+    if (fileSizeMB > 100) {
+      const confirmed = window.confirm(
+        `This file is ${fileSizeMB.toFixed(2)} MB. Large files may take a long time to upload or fail due to timeout. Continue?`
+      );
+      if (!confirmed) {
+        return;
+      }
+    }
+
     setLoading(true);
     setUploadProgress(0);
     setUploadedBytes(0);
@@ -52,6 +63,7 @@ const Upload = () => {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
         },
+        timeout: 300000, // 5 minutes timeout
         onUploadProgress: (progressEvent) => {
           const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
           setUploadProgress(progress);

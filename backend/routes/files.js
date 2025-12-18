@@ -195,10 +195,18 @@ router.delete('/:fileId', auth, (req, res) => {
       return res.status(403).json({ message: 'You can only delete your own files' });
     }
 
-    // ลบไฟล์จาก disk
-    const filePath = path.join(uploadsDir, file.filename);
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
+    // ลบไฟล์จาก disk (ถ้ามี)
+    try {
+      const filePath = path.join(uploadsDir, file.filename);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+        console.log(`✓ Deleted file from disk: ${filePath}`);
+      } else {
+        console.warn(`⚠ File not found on disk: ${filePath}`);
+      }
+    } catch (fsError) {
+      console.error(`✗ Error deleting file from disk: ${fsError.message}`);
+      // Continue anyway - delete from database
     }
 
     // ลบจาก database
@@ -208,6 +216,7 @@ router.delete('/:fileId', auth, (req, res) => {
 
     res.json({ message: 'File deleted successfully' });
   } catch (error) {
+    console.error('Delete error:', error);
     res.status(500).json({ message: 'Delete failed', error: error.message });
   }
 });
