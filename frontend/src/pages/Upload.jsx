@@ -47,6 +47,9 @@ const Upload = () => {
       const fileId = Date.now() + '-' + Math.random().toString(36).substr(2, 9);
       const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
       let uploadedChunks = 0;
+      
+      // Upload directly to backend (HTTP)
+      const backendUrl = 'http://driveback.itc-group.co.th:2087';
 
       // Upload chunks
       for (let i = 0; i < totalChunks; i++) {
@@ -60,7 +63,7 @@ const Upload = () => {
         chunkFormData.append('chunkNumber', i);
         chunkFormData.append('totalChunks', totalChunks);
 
-        await axios.post(`${API_URL}/files/upload/chunk`, chunkFormData, {
+        await axios.post(`${backendUrl}/api/files/upload/chunk`, chunkFormData, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
@@ -81,7 +84,7 @@ const Upload = () => {
         description
       };
 
-      await axios.post(`${API_URL}/files/upload/finalize`, finalizeData, {
+      await axios.post(`${backendUrl}/api/files/upload/finalize`, finalizeData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
