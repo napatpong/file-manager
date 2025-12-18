@@ -19,7 +19,7 @@ const Upload = () => {
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
-    console.log('File selected:', selectedFile?.name, 'Size:', selectedFile?.size);
+    console.warn('✅ FILE SELECTED:', selectedFile?.name, 'Size:', selectedFile?.size, 'bytes');
     setFile(selectedFile);
   };
 
@@ -33,12 +33,12 @@ const Upload = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('=== UPLOAD STARTED ===');
+    console.warn('✅ === UPLOAD FORM SUBMITTED ===');
     setError('');
     setSuccess('');
 
     if (!file) {
-      console.log('No file selected');
+      console.warn('❌ No file selected');
       setError('Please select a file');
       return;
     }
@@ -59,20 +59,16 @@ const Upload = () => {
 
     try {
       // Upload via direct backend HTTPS URL for large files
-      console.log('Starting upload to:', `${DIRECT_BACKEND_URL}/files/upload`);
-      console.log('File size:', file.size, 'bytes');
-      console.log('Token:', token ? 'Present' : 'Missing');
-      console.log('FormData created, about to send...');
+      console.warn('📤 Starting upload to:', `${DIRECT_BACKEND_URL}/files/upload`);
+      console.warn('📊 File size:', file.size, 'bytes');
+      console.warn('🔐 Token:', token ? 'Present' : 'Missing');
+      console.warn('📦 FormData created, about to send...');
       
       const formData = new FormData();
       formData.append('file', file);
       formData.append('description', description);
 
-      console.log('Calling axios.post with config:', {
-        timeout: 600000,
-        maxContentLength: 'Infinity',
-        maxBodyLength: 'Infinity'
-      });
+      console.warn('🚀 Calling axios.post...');
 
       const response = await axios.post(`${DIRECT_BACKEND_URL}/files/upload`, formData, {
         headers: {
@@ -84,14 +80,14 @@ const Upload = () => {
         maxBodyLength: Infinity,
         onUploadProgress: (progressEvent) => {
           const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
-          console.log('Upload progress:', progress, '%', progressEvent.loaded, '/', progressEvent.total);
+          console.warn('⬆️ Upload progress:', progress, '%');
           setUploadProgress(progress);
           setUploadedBytes(progressEvent.loaded);
           setTotalBytes(progressEvent.total);
         }
       });
 
-      console.log('Upload response received:', response.data);
+      console.warn('✅ Upload successful! Response:', response.data);
       setSuccess('File uploaded successfully!');
       setFile(null);
       setDescription('');
@@ -100,7 +96,7 @@ const Upload = () => {
       setTotalBytes(0);
       document.getElementById('fileInput').value = '';
     } catch (err) {
-      console.error('=== UPLOAD ERROR ===');
+      console.error('❌ === UPLOAD ERROR ===');
       console.error('Error message:', err.message);
       console.error('Error code:', err.code);
       console.error('Error response:', err.response?.data);
@@ -120,7 +116,7 @@ const Upload = () => {
       }
     } finally {
       setLoading(false);
-      console.log('Upload handler finished');
+      console.warn('✅ Upload handler finished');
     }
   };
 
