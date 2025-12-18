@@ -14,12 +14,12 @@ routes = [
 ]
 vars = { API_URL = "http://driveback.itc-group.co.th:2087" }
 kv_namespaces = [
-  { binding = "drive_manager", id = "9004cee6560447a9874cb30009088cac", preview_id = "9004cee6560447a9874cb30009088cac" }
+  { binding = "drive_manager", id = "9004cee6560447a9874cb30009088cac" }
 ]
 
 [env.development]
 vars = { API_URL = "http://localhost:2087" }
 kv_namespaces = [
-  { binding = "__STATIC_CONTENT", id = "cee2f7b346f14223814f83af66ca22f6", preview_id = "cee2f7b346f14223814f83af66ca22f6" }
+  { binding = "drive_manager", id = "9004cee6560447a9874cb30009088cac" }
 ]
 
