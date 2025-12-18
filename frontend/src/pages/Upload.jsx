@@ -47,13 +47,7 @@ const Upload = () => {
     formData.append('description', description);
 
     try {
-      // For file uploads, bypass worker and go directly to backend
-      // to avoid Cloudflare 413 Content Too Large limit
-      const uploadUrl = window.location.hostname.includes('drive.itc-group.co.th')
-        ? 'http://driveback.itc-group.co.th:2087/api/files/upload'
-        : `${API_URL}/files/upload`;
-      
-      await axios.post(uploadUrl, formData, {
+      await axios.post(`${API_URL}/files/upload`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
