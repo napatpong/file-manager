@@ -197,12 +197,14 @@ router.delete('/:fileId', auth, (req, res) => {
 
     // ลบไฟล์จาก disk (ถ้ามี)
     try {
-      const filePath = path.join(uploadsDir, file.filename);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-        console.log(`✓ Deleted file from disk: ${filePath}`);
-      } else {
-        console.warn(`⚠ File not found on disk: ${filePath}`);
+      if (file.filename) {
+        const filePath = path.join(uploadsDir, String(file.filename));
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+          console.log(`✓ Deleted file from disk: ${filePath}`);
+        } else {
+          console.warn(`⚠ File not found on disk: ${filePath}`);
+        }
       }
     } catch (fsError) {
       console.error(`✗ Error deleting file from disk: ${fsError.message}`);
