@@ -78,7 +78,9 @@ export default {
         return new Response(indexHtml, {
           headers: {
             'Content-Type': 'text/html; charset=utf-8',
-            'Cache-Control': 'no-cache, no-store, must-revalidate'
+            'Cache-Control': 'no-cache, no-store, must-revalidate, private',
+            'Pragma': 'no-cache',
+            'Expires': '0'
           }
         })
       } catch (err) {
