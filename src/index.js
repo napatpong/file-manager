@@ -1,3 +1,5 @@
+import { getAssetFromKV, mapRequestToAsset } from '@cloudflare/kv-asset-handler'
+
 export default {
   async fetch(request, env, ctx) {
     try {
@@ -12,28 +14,6 @@ export default {
             'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
             'Access-Control-Allow-Headers': 'Content-Type, Authorization',
             'Access-Control-Max-Age': '86400'
-          }
-        })
-      }
-      
-      // Serve static assets with correct MIME types
-      if (path === '/assets/index-DNwVaC2R.js') {
-        // Return 200 OK but with a note to fetch from CDN
-        // In production, Cloudflare will serve this from the origin
-        return new Response('', {
-          status: 404,
-          headers: {
-            'Content-Type': 'application/javascript',
-            'X-Msg': 'Asset should be served by Cloudflare'
-          }
-        })
-      }
-      
-      if (path === '/assets/index-C6nvBeLd.css') {
-        return new Response('', {
-          status: 404,
-          headers: {
-            'Content-Type': 'text/css'
           }
         })
       }
@@ -102,9 +82,33 @@ export default {
         })
       }
       
+      // Serve static assets from Cloudflare Workers Site (__STATIC_CONTENT binding)
+      if (path.startsWith('/assets/') || path.endsWith('.css') || path.endsWith('.js') || path === '/index.html') {
+        try {
+          const asset = await getAssetFromKV({
+            request,
+            waitUntil: ctx.waitUntil
+          })
+          return asset
+        } catch (err) {
+          // Fall through to serve index.html for non-static routes
+        }
+      }
+      
       // For all other requests, serve index.html for SPA routing
-      return new Response(
-        `<!DOCTYPE html>
+      try {
+        const indexReq = new Request(new URL('/index.html', request.url).toString(), {
+          method: 'GET'
+        })
+        const asset = await getAssetFromKV({
+          request: indexReq,
+          waitUntil: ctx.waitUntil
+        })
+        return asset
+      } catch (err) {
+        // Fallback if getAssetFromKV fails
+        return new Response(
+          `<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -117,13 +121,14 @@ export default {
     <div id="root"></div>
   </body>
 </html>`,
-        {
-          headers: {
-            'Content-Type': 'text/html; charset=utf-8',
-            'Cache-Control': 'no-cache, no-store, must-revalidate'
+          {
+            headers: {
+              'Content-Type': 'text/html; charset=utf-8',
+              'Cache-Control': 'no-cache, no-store, must-revalidate'
+            }
           }
-        }
-      )
+        )
+      }
     } catch (error) {
       return new Response('Internal Server Error: ' + error.message, {
         status: 500,
