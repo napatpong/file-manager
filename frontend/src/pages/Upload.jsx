@@ -60,7 +60,7 @@ const Upload = () => {
         chunkFormData.append('chunkNumber', i);
         chunkFormData.append('totalChunks', totalChunks);
 
-        await axios.post(`${API_URL}/chunk`, chunkFormData, {
+        await axios.post(`${API_URL}/files/upload/chunk`, chunkFormData, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
@@ -81,7 +81,7 @@ const Upload = () => {
         description
       };
 
-      await axios.post(`${API_URL}/finalize`, finalizeData, {
+      await axios.post(`${API_URL}/files/upload/finalize`, finalizeData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
