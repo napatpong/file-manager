@@ -12,7 +12,7 @@ build = { command = "npm run build", cwd = "./frontend" }
 routes = [
   { pattern = "drive.itc-group.co.th/*", zone_name = "itc-group.co.th" }
 ]
-vars = { API_URL = "http://driveback.itc-group.co.th:2087" }
+vars = { API_URL = "https://driveback.itc-group.co.th" }
 kv_namespaces = [
   { binding = "drive_manager", id = "9004cee6560447a9874cb30009088cac" }
 ]
