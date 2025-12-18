@@ -1,4 +1,7 @@
-import { getAssetFromKV, mapRequestToAsset } from '@cloudflare/kv-asset-handler'
+import { getAssetFromKV } from '@cloudflare/kv-asset-handler'
+import manifestJSON from '__STATIC_CONTENT_MANIFEST'
+
+const assetManifest = JSON.parse(manifestJSON)
 
 export default {
   async fetch(request, env, ctx) {
@@ -92,13 +95,17 @@ export default {
             },
             {
               ASSET_NAMESPACE: env.__STATIC_CONTENT,
-              ASSET_MANIFEST: undefined
+              ASSET_MANIFEST: assetManifest
             }
           )
           return asset
         } catch (err) {
-          // Asset not found
-          return new Response('Asset not found: ' + err.message, { 
+          // Asset not found - detailed error for debugging
+          return new Response(`Asset not found
+Path: ${path}
+Error: ${err.message}
+Stack: ${err.stack}
+KV Namespace: ${env.__STATIC_CONTENT ? 'EXISTS' : 'MISSING'}`, { 
             status: 404,
             headers: { 'Content-Type': 'text/plain' }
           })
@@ -117,7 +124,7 @@ export default {
           },
           {
             ASSET_NAMESPACE: env.__STATIC_CONTENT,
-            ASSET_MANIFEST: undefined
+            ASSET_MANIFEST: assetManifest
           }
         )
         return asset
