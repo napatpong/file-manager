@@ -47,7 +47,7 @@ export default {
       let filePath = path === '/' ? '/index.html' : path
       
       try {
-        const asset = await env.__STATIC_CONTENT.get(filePath, { type: 'arrayBuffer' })
+        const asset = await env.drive_manager.get(filePath, { type: 'arrayBuffer' })
         
         if (asset) {
           let contentType = 'application/octet-stream'
@@ -74,7 +74,7 @@ export default {
       
       // Return index.html for SPA routing on all unknown paths
       try {
-        const indexHtml = await env.__STATIC_CONTENT.get('/index.html', { type: 'text' })
+        const indexHtml = await env.drive_manager.get('/index.html', { type: 'text' })
         return new Response(indexHtml, {
           headers: {
             'Content-Type': 'text/html; charset=utf-8',

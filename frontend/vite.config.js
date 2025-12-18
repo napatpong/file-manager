@@ -5,6 +5,16 @@ const isDev = process.env.NODE_ENV === 'development'
 
 export default defineConfig({
   plugins: [react()],
+  build: {
+    // Force rebuild with new hash on each build
+    rollupOptions: {
+      output: {
+        entryFileNames: `assets/[name]-[hash].js`,
+        chunkFileNames: `assets/[name]-[hash].js`,
+        assetFileNames: `assets/[name]-[hash][extname]`
+      }
+    }
+  },
   server: {
     host: '0.0.0.0',
     port: isDev ? 3000 : 12443,

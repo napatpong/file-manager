@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { FiDownload, FiTrash2, FiFile, FiList, FiGrid } from 'react-icons/fi';
 import API_URL from '../config/api.js';
 
+// Progress bar implementation for both grid and list views - 2025-12-18
 const Dashboard = () => {
   const { token, user } = useAuth();
   const [files, setFiles] = useState([]);
