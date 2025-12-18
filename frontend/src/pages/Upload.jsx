@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { FiUploadCloud, FiCheck } from 'react-icons/fi';
-import API_URL from '../config/api.js';
+import API_URL, { DIRECT_BACKEND_URL } from '../config/api.js';
 
 const Upload = () => {
   const { token } = useAuth();
@@ -56,7 +56,8 @@ const Upload = () => {
     formData.append('description', description);
 
     try {
-      await axios.post(`${API_URL}/files/upload`, formData, {
+      // Use direct backend URL for uploads to bypass Cloudflare Worker 100MB limit
+      await axios.post(`${DIRECT_BACKEND_URL}/files/upload`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
