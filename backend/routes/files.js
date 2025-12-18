@@ -33,7 +33,7 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 1024 * 1024 * 1024 // 1GB limit
+    fileSize: 2 * 1024 * 1024 * 1024 // 2GB limit
   },
   fileFilter: (req, file, cb) => {
     // Fix UTF-8 encoding for Thai filenames

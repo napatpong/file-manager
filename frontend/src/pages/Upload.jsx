@@ -37,23 +37,13 @@ const Upload = () => {
       return;
     }
 
-    // Check file size limit (100MB for Cloudflare Worker)
+    // Check file size limit (2GB maximum)
     const fileSizeMB = file.size / (1024 * 1024);
-    const MAX_FILE_SIZE_MB = 100;
+    const MAX_FILE_SIZE_MB = 2048; // 2GB
     
     if (fileSizeMB > MAX_FILE_SIZE_MB) {
-      setError(`File is too large (${fileSizeMB.toFixed(2)} MB). Maximum file size is ${MAX_FILE_SIZE_MB} MB. Please use a smaller file or contact administrator to enable backend SSL for larger uploads.`);
+      setError(`File is too large (${fileSizeMB.toFixed(2)} MB). Maximum file size is ${MAX_FILE_SIZE_MB} MB (2GB).`);
       return;
-    }
-
-    // Warning for large files (over 50MB)
-    if (fileSizeMB > 50) {
-      const confirmed = window.confirm(
-        `This file is ${fileSizeMB.toFixed(2)} MB. Large files may take time to upload. Continue?`
-      );
-      if (!confirmed) {
-        return;
-      }
     }
 
     setLoading(true);
@@ -71,7 +61,7 @@ const Upload = () => {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
         },
-        timeout: 300000, // 5 minutes timeout
+        timeout: 3600000, // 1 hour timeout for large files
         onUploadProgress: (progressEvent) => {
           const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
           setUploadProgress(progress);
@@ -89,7 +79,9 @@ const Upload = () => {
       document.getElementById('fileInput').value = '';
     } catch (err) {
       if (err.response?.status === 413) {
-        setError('File is too large. Maximum file size is 100 MB through web interface.');
+        setError('File is too large. Maximum file size is 2 GB.');
+      } else if (err.code === 'ECONNABORTED') {
+        setError('Upload timeout. Please try again or contact administrator.');
       } else {
         setError(err.response?.data?.message || 'Upload failed');
       }
