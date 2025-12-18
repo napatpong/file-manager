@@ -22,10 +22,10 @@ const FileAccess = () => {
   const fetchData = async () => {
     try {
       const [filesRes, usersRes] = await Promise.all([
-        axios.get(`${API_URL}/api/files`, {
+        axios.get(`${API_URL}/files`, {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        axios.get(`${API_URL}/api/users`, {
+        axios.get(`${API_URL}/users`, {
           headers: { Authorization: `Bearer ${token}` }
         })
       ]);
@@ -43,7 +43,7 @@ const FileAccess = () => {
     setSelectedUserId('');
     try {
       const response = await axios.get(
-        `${API_URL}/api/files/${file.id}/access`,
+        `${API_URL}/files/${file.id}/access`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
@@ -63,7 +63,7 @@ const FileAccess = () => {
     setGranting(true);
     try {
       await axios.post(
-        `${API_URL}/api/files/${selectedFile.id}/access`,
+        `${API_URL}/files/${selectedFile.id}/access`,
         { userId: parseInt(selectedUserId) },
         {
           headers: { Authorization: `Bearer ${token}` }
@@ -84,7 +84,7 @@ const FileAccess = () => {
 
     try {
       await axios.delete(
-        `${API_URL}/api/files/${selectedFile.id}/access/${userId}`,
+        `${API_URL}/files/${selectedFile.id}/access/${userId}`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }

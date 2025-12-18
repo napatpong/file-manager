@@ -22,7 +22,7 @@ const Dashboard = () => {
 
   const fetchFiles = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/files`, {
+      const response = await axios.get(`${API_URL}/files`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setFiles(response.data);
@@ -58,7 +58,7 @@ const Dashboard = () => {
       setTotalDownloadBytes(filesize);
 
       const response = await axios.get(
-        `${API_URL}/api/files/${fileId}/download`,
+        `${API_URL}/files/${fileId}/download`,
         {
           headers: { Authorization: `Bearer ${token}` },
           responseType: 'blob',
@@ -96,7 +96,7 @@ const Dashboard = () => {
     if (!window.confirm('Are you sure you want to delete this file?')) return;
 
     try {
-      await axios.delete(`${API_URL}/api/files/${fileId}`, {
+      await axios.delete(`${API_URL}/files/${fileId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       // Refresh the files list after delete

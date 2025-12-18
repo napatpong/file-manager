@@ -26,7 +26,7 @@ const Users = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/users`, {
+      const response = await axios.get(`${API_URL}/users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUsers(response.data);
@@ -50,7 +50,7 @@ const Users = () => {
 
   const handleSave = async (userId) => {
     try {
-      await axios.put(`${API_URL}/api/users/${userId}`, editData, {
+      await axios.put(`${API_URL}/users/${userId}`, editData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setEditingId(null);
@@ -64,7 +64,7 @@ const Users = () => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
 
     try {
-      await axios.delete(`${API_URL}/api/users/${userId}`, {
+      await axios.delete(`${API_URL}/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchUsers();
@@ -83,7 +83,7 @@ const Users = () => {
 
     setCreatingUser(true);
     try {
-      await axios.post(`${API_URL}/api/users`, createData, {
+      await axios.post(`${API_URL}/users`, createData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert('User created successfully!');
