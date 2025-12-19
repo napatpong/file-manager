@@ -153,7 +153,7 @@ export const db = {
         return { changes: 1 };
       }
       if (sql.includes('DELETE FROM users')) {
-        const idx = storage.users.findIndex(u => u.id === params[0]);
+        const idx = storage.users.findIndex(u => u.id === parseInt(params[0]));
         if (idx !== -1) storage.users.splice(idx, 1);
         saveStorage();
         return { changes: 1 };
@@ -181,7 +181,7 @@ export const db = {
         return { changes: 1 };
       }
       if (sql.includes('DELETE FROM user_permissions')) {
-        const idx = storage.user_permissions.findIndex(p => p.userId === params[0]);
+        const idx = storage.user_permissions.findIndex(p => p.userId === parseInt(params[0]));
         if (idx !== -1) storage.user_permissions.splice(idx, 1);
         saveStorage();
         return { changes: 1 };
