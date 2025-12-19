@@ -70,9 +70,9 @@ app.use(cors({
 // Handle preflight requests explicitly
 app.options('*', cors());
 
-// Increase body size limit to 2GB for large file uploads
-app.use(express.json({ limit: '2gb' }));
-app.use(express.urlencoded({ limit: '2gb', extended: true }));
+// Increase body size limit to unlimited for large file uploads
+app.use(express.json({ limit: '50gb' }));
+app.use(express.urlencoded({ limit: '50gb', extended: true }));
 
 // Routes
 app.use('/api/auth', authRoutes);
