@@ -202,13 +202,19 @@ const Users = () => {
                 <td className="px-6 py-4">
                   <button
                     onClick={() => handleDelete(user.id)}
-                    disabled={currentUser?.id === user.id}
+                    disabled={currentUser?.id === user.id || user.username === 'admin'}
                     className={`${
-                      currentUser?.id === user.id
+                      currentUser?.id === user.id || user.username === 'admin'
                         ? 'bg-gray-400 cursor-not-allowed'
                         : 'bg-red-600 hover:bg-red-700'
                     } text-white font-semibold py-1 px-3 rounded flex items-center space-x-1 transition`}
-                    title={currentUser?.id === user.id ? 'Cannot delete your own account' : 'Delete user'}
+                    title={
+                      currentUser?.id === user.id 
+                        ? 'Cannot delete your own account' 
+                        : user.username === 'admin'
+                        ? 'Cannot delete admin user'
+                        : 'Delete user'
+                    }
                   >
                     <FiTrash2 />
                     <span>Delete</span>

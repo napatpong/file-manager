@@ -142,6 +142,11 @@ router.delete('/:userId', auth, checkRole(['admin']), (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    // ไม่ให้ลบ admin user
+    if (user.username === 'admin') {
+      return res.status(403).json({ message: 'Cannot delete admin user' });
+    }
+
     // ลบ files ที่ user นี้ uploaded
     const userFiles = db.prepare('SELECT filename, id FROM files WHERE uploadedBy = ?').all(userId);
     
