@@ -2,6 +2,13 @@
 
 A unified file management application with React frontend and Node.js backend.
 
+## Clone Repository
+
+```bash
+git clone https://github.com/napatpong/file-manager.git
+cd file-manager
+```
+
 ## Quick Start
 
 ### Installation
