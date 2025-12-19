@@ -77,37 +77,48 @@ const Upload = () => {
     let lastProgressTime = Date.now();
     let lastProgressBytes = 0;
 
-    const response = await axios.post(`${API_URL}/files/upload`, formData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'multipart/form-data'
-      },
-      timeout: 1800000, // 30 minutes
-      maxContentLength: Infinity,
-      maxBodyLength: Infinity,
-      onUploadProgress: (progressEvent) => {
-        const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
-        const now = Date.now();
-        const timeDiff = now - lastProgressTime;
-        const bytesDiff = progressEvent.loaded - lastProgressBytes;
-        const speedMBps = (bytesDiff / 1024 / 1024) / (timeDiff / 1000);
-        
-        setUploadProgress(progress);
-        setUploadedBytes(progressEvent.loaded);
-        setTotalBytes(progressEvent.total);
-        
-        lastProgressTime = now;
-        lastProgressBytes = progressEvent.loaded;
-      }
-    });
+    try {
+      const response = await axios.post(`${API_URL}/files/upload`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        },
+        timeout: 1800000, // 30 minutes
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity,
+        onUploadProgress: (progressEvent) => {
+          const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+          const now = Date.now();
+          const timeDiff = now - lastProgressTime;
+          const bytesDiff = progressEvent.loaded - lastProgressBytes;
+          const speedMBps = (bytesDiff / 1024 / 1024) / (timeDiff / 1000);
+          
+          setUploadProgress(progress);
+          setUploadedBytes(progressEvent.loaded);
+          setTotalBytes(progressEvent.total);
+          
+          lastProgressTime = now;
+          lastProgressBytes = progressEvent.loaded;
+        }
+      });
 
-    setSuccess('File uploaded successfully!');
-    setFile(null);
-    setDescription('');
-    setUploadProgress(0);
-    setUploadedBytes(0);
-    setTotalBytes(0);
-    document.getElementById('fileInput').value = '';
+      setSuccess('File uploaded successfully!');
+      setFile(null);
+      setDescription('');
+      setUploadProgress(0);
+      setUploadedBytes(0);
+      setTotalBytes(0);
+      document.getElementById('fileInput').value = '';
+    } catch (err) {
+      if (err.code === 'ECONNABORTED') {
+        setError('Upload timeout - request took too long');
+      } else if (!err.response) {
+        setError('Network error - no response from server');
+      } else {
+        setError(err.response?.data?.message || err.message || 'Upload failed');
+      }
+      throw err;
+    }
   };
 
   return (

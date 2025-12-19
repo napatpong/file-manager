@@ -102,16 +102,28 @@ router.get('/', auth, (req, res) => {
 
 // Upload file
 router.post('/upload', auth, checkRole(['uploader', 'admin']), (req, res) => {
+  console.log('[UPLOAD] Request received for user:', req.userId);
+  
   // Use upload middleware and handle events
   upload.single('file')(req, res, (err) => {
+    console.log('[UPLOAD] Multer processing completed, error:', err);
+    
     if (err) {
+      console.error('[UPLOAD] Multer error:', err.message);
       return res.status(400).json({ message: 'Upload error: ' + err.message });
     }
 
     try {
       if (!req.file) {
+        console.error('[UPLOAD] No file in request');
         return res.status(400).json({ message: 'No file uploaded' });
       }
+
+      console.log('[UPLOAD] File received:', {
+        originalname: req.file.originalname,
+        filename: req.file.filename,
+        size: req.file.size
+      });
 
       const { description } = req.body;
       
@@ -119,6 +131,8 @@ router.post('/upload', auth, checkRole(['uploader', 'admin']), (req, res) => {
         INSERT INTO files (filename, originalname, uploadedBy, filesize, description)
         VALUES (?, ?, ?, ?, ?)
       `).run(req.file.filename, req.file.originalname, req.userId, req.file.size, description || '');
+
+      console.log('[UPLOAD] File saved to database, ID:', result.lastInsertRowid);
 
       res.status(201).json({
         message: 'File uploaded successfully',
@@ -130,6 +144,7 @@ router.post('/upload', auth, checkRole(['uploader', 'admin']), (req, res) => {
         }
       });
     } catch (error) {
+      console.error('[UPLOAD] Error:', error.message);
       res.status(500).json({ message: 'Upload failed', error: error.message });
     }
   });
