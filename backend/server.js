@@ -57,9 +57,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// CORS configuration - allow all origins
+// CORS configuration - allow all origins (HTTP:2095, HTTPS:2096 for frontend, HTTP:2086, HTTPS:2087 for backend)
 app.use(cors({
-  origin: '*',
+  origin: '*', // Allow all origins
   credentials: false,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-file-id', 'x-chunk-index', 'x-total-chunks', 'x-chunk-size'],

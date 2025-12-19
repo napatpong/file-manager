@@ -32,7 +32,7 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',
-    port: isDev ? 3000 : 2096,
+    port: isDev ? 2095 : 2096,
     open: isDev ? true : false,
     https: isDev ? false : httpsConfig
   },
