@@ -125,34 +125,47 @@ router.put('/:userId', auth, checkRole(['admin']), (req, res) => {
 router.delete('/:userId', auth, checkRole(['admin']), (req, res) => {
   try {
     const { userId } = req.params;
+    console.log('[USER DELETE] 🔵 === DELETE USER REQUEST ===');
+    console.log('[USER DELETE] User ID to delete:', userId);
+    console.log('[USER DELETE] Current user ID:', req.userId);
 
     // ไม่ให้ลบ admin ตัวเอง
     if (req.userId === parseInt(userId)) {
+      console.log('[USER DELETE] ❌ Attempt to delete own account');
       return res.status(400).json({ message: 'Cannot delete your own account' });
     }
 
     const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
 
     if (!user) {
+      console.log('[USER DELETE] ❌ User not found');
       return res.status(404).json({ message: 'User not found' });
     }
 
+    console.log('[USER DELETE] Found user:', user.username);
+
     // ลบ files ที่ user นี้ uploaded
-    const userFiles = db.prepare('SELECT filename FROM files WHERE uploadedBy = ?').all(userId);
+    const userFiles = db.prepare('SELECT filename, id FROM files WHERE uploadedBy = ?').all(userId);
+    console.log('[USER DELETE] Found', userFiles.length, 'files to delete');
+    
     for (const file of userFiles) {
-      db.prepare('DELETE FROM file_access WHERE fileId = (SELECT id FROM files WHERE filename = ?)').run(file.filename);
-      db.prepare('DELETE FROM file_downloads WHERE fileId = (SELECT id FROM files WHERE filename = ?)').run(file.filename);
-      db.prepare('DELETE FROM files WHERE filename = ?').run(file.filename);
+      console.log('[USER DELETE] Deleting file:', file.filename);
+      db.prepare('DELETE FROM file_access WHERE fileId = ?').run(file.id);
+      db.prepare('DELETE FROM file_downloads WHERE fileId = ?').run(file.id);
+      db.prepare('DELETE FROM files WHERE id = ?').run(file.id);
     }
 
     // ลบ permissions, downloads และ user
+    console.log('[USER DELETE] Deleting user records');
     db.prepare('DELETE FROM user_permissions WHERE userId = ?').run(userId);
     db.prepare('DELETE FROM file_downloads WHERE userId = ?').run(userId);
     db.prepare('DELETE FROM file_access WHERE userId = ?').run(userId);
     db.prepare('DELETE FROM users WHERE id = ?').run(userId);
 
+    console.log('[USER DELETE] ✅ === USER DELETED SUCCESSFULLY ===');
     res.json({ message: 'User deleted successfully' });
   } catch (error) {
+    console.error('[USER DELETE] ❌ Error:', error.message);
     res.status(500).json({ message: 'Delete failed', error: error.message });
   }
 });
