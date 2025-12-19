@@ -3,8 +3,8 @@
     {
       "id": 1,
       "username": "admin",
-      "email": "admin@filemanager.com",
-      "password": "$2a$10$6FYLWGeaozFST50RIg7vdeYKuHiqayfJXcIzfcXnFWHZQ7.4EtBnW",
+      "email": "it-admin@itc-group.co.th",
+      "password": "$2a$10$7cA62q1meORKzs.dqhRPOuwwsL9djWT6cFpbTFL40dCTQZV58KeVi",
       "role": "admin",
       "created_at": "2025-12-16T04:01:31.186Z",
       "updated_at": "2025-12-16T04:01:31.187Z"
