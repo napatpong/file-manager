@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { FiUploadCloud, FiCheck } from 'react-icons/fi';
-import API_URL, { DIRECT_BACKEND_URL } from '../config/api.js';
+import API_URL from '../config/api.js';
 
 const Upload = () => {
   const { token } = useAuth();
@@ -64,14 +64,7 @@ const Upload = () => {
     setTotalBytes(file.size);
 
     try {
-      // Use chunked upload for files > 100MB
-      if (file.size > 100 * 1024 * 1024) {
-        console.error('📦 File > 100MB, using chunked upload');
-        await uploadChunked();
-      } else {
-        console.error('📦 File < 100MB, using single upload');
-        await uploadSingle();
-      }
+      await uploadSingle();
     } catch (error) {
       console.error('❌ === UPLOAD FAILED ===');
       console.error('Error:', error.message);
@@ -82,8 +75,8 @@ const Upload = () => {
   };
 
   const uploadSingle = async () => {
-    // Original single upload method
-    console.error('🚀 Starting single file upload');
+    // Single upload method
+    console.error('🚀 Starting file upload');
     
     const formData = new FormData();
     formData.append('file', file);
@@ -92,7 +85,7 @@ const Upload = () => {
     let lastProgressTime = Date.now();
     let lastProgressBytes = 0;
 
-    const response = await axios.post(`${DIRECT_BACKEND_URL}/files/upload`, formData, {
+    const response = await axios.post(`${API_URL}/files/upload`, formData, {
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'multipart/form-data'
@@ -118,69 +111,7 @@ const Upload = () => {
       }
     });
 
-    console.error('✅ Single upload successful!');
-    setSuccess('File uploaded successfully!');
-    setFile(null);
-    setDescription('');
-    setUploadProgress(0);
-    setUploadedBytes(0);
-    setTotalBytes(0);
-    document.getElementById('fileInput').value = '';
-  };
-
-  const uploadChunked = async () => {
-    // Chunked upload for large files
-    console.error('🔄 Starting chunked upload');
-    
-    const CHUNK_SIZE = 50 * 1024 * 1024; // 50MB chunks
-    const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-    const fileId = Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-    
-    console.error(`📦 File will be split into ${totalChunks} chunks of ${CHUNK_SIZE / 1024 / 1024}MB each`);
-
-    for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
-      const start = chunkIndex * CHUNK_SIZE;
-      const end = Math.min(start + CHUNK_SIZE, file.size);
-      const chunk = file.slice(start, end);
-      
-      console.error(`📤 Uploading chunk ${chunkIndex + 1}/${totalChunks} (${(chunk.size/1024/1024).toFixed(1)}MB)`);
-
-      try {
-        const response = await axios.post(
-          `${DIRECT_BACKEND_URL}/files/upload-chunk`,
-          chunk,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/octet-stream',
-              'X-Chunk-Index': chunkIndex,
-              'X-Total-Chunks': totalChunks,
-              'X-File-Name': file.name,
-              'X-File-ID': fileId
-            },
-            timeout: 300000, // 5 minutes per chunk
-            maxContentLength: Infinity,
-            maxBodyLength: Infinity,
-            onUploadProgress: (progressEvent) => {
-              const chunkProgress = (progressEvent.loaded / chunk.size) * 100;
-              const totalProgress = ((chunkIndex * CHUNK_SIZE + progressEvent.loaded) / file.size) * 100;
-              
-              console.error(`⬆️ Chunk ${chunkIndex + 1}/${totalChunks}: ${chunkProgress.toFixed(0)}% | Total: ${totalProgress.toFixed(1)}%`);
-              
-              setUploadProgress(Math.round(totalProgress));
-              setUploadedBytes(chunkIndex * CHUNK_SIZE + progressEvent.loaded);
-            }
-          }
-        );
-
-        console.error(`✅ Chunk ${chunkIndex + 1}/${totalChunks} uploaded successfully`);
-      } catch (error) {
-        console.error(`❌ Chunk ${chunkIndex + 1} failed:`, error.message);
-        throw new Error(`Failed to upload chunk ${chunkIndex + 1}`);
-      }
-    }
-
-    console.error('✅ All chunks uploaded successfully!');
+    console.error('✅ Upload successful!');
     setSuccess('File uploaded successfully!');
     setFile(null);
     setDescription('');
