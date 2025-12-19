@@ -5,12 +5,10 @@ import { FiEdit2, FiTrash2, FiUser, FiPlus } from 'react-icons/fi';
 import API_URL from '../config/api.js';
 
 const Users = () => {
-  const { token } = useAuth();
+  const { token, user: currentUser } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [editingId, setEditingId] = useState(null);
-  const [editData, setEditData] = useState({});
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [createData, setCreateData] = useState({
     username: '',
@@ -37,25 +35,11 @@ const Users = () => {
   };
 
   const handleEdit = (user) => {
-    setEditingId(user.id);
-    setEditData({
-      username: user.username,
-      role: user.role,
-      canUpload: user.canUpload,
-      canDownload: user.canDownload
-    });
+    // Edit functionality removed
   };
 
   const handleSave = async (userId) => {
-    try {
-      await axios.put(`${API_URL}/users/${userId}`, editData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setEditingId(null);
-      fetchUsers();
-    } catch (err) {
-      alert(err.response?.data?.message || 'Update failed');
-    }
+    // Save functionality removed
   };
 
   const handleDelete = async (userId, userRole) => {
@@ -186,7 +170,6 @@ const Users = () => {
           <thead className="bg-gray-100 border-b">
             <tr>
               <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Username</th>
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Email</th>
               <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Role</th>
               <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Permissions</th>
               <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Actions</th>
@@ -208,18 +191,6 @@ const Users = () => {
                       <FiUser className="text-blue-500" />
                       <span>{user.username}</span>
                     </span>
-                  )}
-                </td>
-                <td className="px-6 py-4 min-w-[280px]">
-                  {editingId === user.id ? (
-                    <input
-                      type="email"
-                      value={editData.email}
-                      onChange={(e) => setEditData({ ...editData, email: e.target.value })}
-                      className="w-full px-2 py-1 border border-gray-300 rounded"
-                    />
-                  ) : (
-                    <span>{user.email}</span>
                   )}
                 </td>
                 <td className="px-6 py-4">
@@ -289,23 +260,19 @@ const Users = () => {
                       </button>
                     </div>
                   ) : (
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => handleEdit(user)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-3 rounded flex items-center space-x-1 transition"
-                      >
-                        <FiEdit2 />
-                        <span>Edit</span>
-                      </button>
-                      <button
-                        onClick={() => handleDelete(user.id)}
-                        className="bg-red-600 hover:bg-red-700 text-white font-semibold py-1 px-3 rounded flex items-center space-x-1 transition"
-                        title="Delete user"
-                      >
-                        <FiTrash2 />
-                        <span>Delete</span>
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => handleDelete(user.id)}
+                      disabled={currentUser?.id === user.id}
+                      className={`${
+                        currentUser?.id === user.id
+                          ? 'bg-gray-400 cursor-not-allowed'
+                          : 'bg-red-600 hover:bg-red-700'
+                      } text-white font-semibold py-1 px-3 rounded flex items-center space-x-1 transition`}
+                      title={currentUser?.id === user.id ? 'Cannot delete your own account' : 'Delete user'}
+                    >
+                      <FiTrash2 />
+                      <span>Delete</span>
+                    </button>
                   )}
                 </td>
               </tr>
