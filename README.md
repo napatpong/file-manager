@@ -34,7 +34,3 @@ Edit `.env` or `.env.production` to configure:
 - `UPLOAD_DIR`: Upload directory path
 - `JWT_SECRET`: JWT secret key
 - `NODE_ENV`: development or production
-
-## Default Credentials
-- Username: `admin`
-- Password: `*#482Admin#`
