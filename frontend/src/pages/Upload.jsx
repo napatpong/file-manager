@@ -74,10 +74,18 @@ const Upload = () => {
     formData.append('file', file);
     formData.append('description', description);
 
+    console.log('[UPLOAD] Starting upload:', {
+      filename: file.name,
+      size: file.size,
+      sizeMB: (file.size / 1024 / 1024).toFixed(2),
+      api: API_URL
+    });
+
     let lastProgressTime = Date.now();
     let lastProgressBytes = 0;
 
     try {
+      console.log('[UPLOAD] Creating axios request...');
       const response = await axios.post(`${API_URL}/files/upload`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -88,6 +96,11 @@ const Upload = () => {
         maxBodyLength: Infinity,
         onUploadProgress: (progressEvent) => {
           const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+          console.log('[UPLOAD] Progress:', progress + '%', {
+            loaded: progressEvent.loaded,
+            total: progressEvent.total
+          });
+          
           const now = Date.now();
           const timeDiff = now - lastProgressTime;
           const bytesDiff = progressEvent.loaded - lastProgressBytes;
@@ -102,6 +115,7 @@ const Upload = () => {
         }
       });
 
+      console.log('[UPLOAD] Success response:', response.status);
       setSuccess('File uploaded successfully!');
       setFile(null);
       setDescription('');
@@ -110,10 +124,17 @@ const Upload = () => {
       setTotalBytes(0);
       document.getElementById('fileInput').value = '';
     } catch (err) {
+      console.error('[UPLOAD] Error caught:', {
+        code: err.code,
+        message: err.message,
+        response: err.response?.status,
+        responseData: err.response?.data
+      });
+      
       if (err.code === 'ECONNABORTED') {
         setError('Upload timeout - request took too long');
       } else if (!err.response) {
-        setError('Network error - no response from server');
+        setError('Network error - no response from server. Check browser console for details.';
       } else {
         setError(err.response?.data?.message || err.message || 'Upload failed');
       }
