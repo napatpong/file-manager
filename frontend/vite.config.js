@@ -1,7 +1,22 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const isDev = process.env.NODE_ENV === 'development'
+
+// Load SSL certificates if they exist
+const sslDir = path.join(__dirname, '..', 'ssl')
+const certFile = path.join(sslDir, 'itc.in.th.crt')
+const keyFile = path.join(sslDir, 'itc.in.th.key')
+const hasSSL = fs.existsSync(certFile) && fs.existsSync(keyFile)
+
+const httpsConfig = hasSSL ? {
+  cert: fs.readFileSync(certFile),
+  key: fs.readFileSync(keyFile)
+} : true
 
 export default defineConfig({
   plugins: [react()],
@@ -19,13 +34,13 @@ export default defineConfig({
     host: '0.0.0.0',
     port: isDev ? 3000 : 12443,
     open: isDev ? true : false,
-    https: false
+    https: isDev ? false : httpsConfig
   },
   preview: {
     host: '0.0.0.0',
     port: 12443,
     open: false,
-    https: false,
+    https: httpsConfig,
     allowedHosts: [
       'localhost',
       '127.0.0.1',
