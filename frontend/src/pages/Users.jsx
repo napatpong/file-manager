@@ -26,9 +26,12 @@ const Users = () => {
       const response = await axios.get(`${API_URL}/users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setUsers(response.data);
+      // Ensure response.data is an array
+      const usersData = Array.isArray(response.data) ? response.data : [];
+      setUsers(usersData);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch users');
+      setUsers([]);
     } finally {
       setLoading(false);
     }

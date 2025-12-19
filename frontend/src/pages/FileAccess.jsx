@@ -29,10 +29,15 @@ const FileAccess = () => {
           headers: { Authorization: `Bearer ${token}` }
         })
       ]);
-      setFiles(filesRes.data);
-      setUsers(usersRes.data);
+      // Ensure responses are arrays
+      const filesData = Array.isArray(filesRes.data) ? filesRes.data : [];
+      const usersData = Array.isArray(usersRes.data) ? usersRes.data : [];
+      setFiles(filesData);
+      setUsers(usersData);
     } catch (err) {
       setError('Failed to fetch data');
+      setFiles([]);
+      setUsers([]);
     } finally {
       setLoading(false);
     }

@@ -25,9 +25,12 @@ const Dashboard = () => {
       const response = await axios.get(`${API_URL}/files`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setFiles(response.data);
+      // Ensure response.data is an array
+      const filesData = Array.isArray(response.data) ? response.data : [];
+      setFiles(filesData);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch files');
+      setFiles([]);
     } finally {
       setLoading(false);
     }
