@@ -137,9 +137,18 @@ router.delete('/:userId', auth, checkRole(['admin']), (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // ลบ permissions และ user
+    // ลบ files ที่ user นี้ uploaded
+    const userFiles = db.prepare('SELECT filename FROM files WHERE uploadedBy = ?').all(userId);
+    for (const file of userFiles) {
+      db.prepare('DELETE FROM file_access WHERE fileId = (SELECT id FROM files WHERE filename = ?)').run(file.filename);
+      db.prepare('DELETE FROM file_downloads WHERE fileId = (SELECT id FROM files WHERE filename = ?)').run(file.filename);
+      db.prepare('DELETE FROM files WHERE filename = ?').run(file.filename);
+    }
+
+    // ลบ permissions, downloads และ user
     db.prepare('DELETE FROM user_permissions WHERE userId = ?').run(userId);
     db.prepare('DELETE FROM file_downloads WHERE userId = ?').run(userId);
+    db.prepare('DELETE FROM file_access WHERE userId = ?').run(userId);
     db.prepare('DELETE FROM users WHERE id = ?').run(userId);
 
     res.json({ message: 'User deleted successfully' });
