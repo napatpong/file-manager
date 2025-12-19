@@ -159,14 +159,24 @@ export const db = {
         return { changes: 1 };
       }
       if (sql.includes('DELETE FROM files')) {
-        const idx = storage.files.findIndex(f => f.id === params[0]);
-        if (idx !== -1) storage.files.splice(idx, 1);
+        // Support both DELETE FROM files WHERE id = ? and WHERE uploadedBy = ?
+        if (sql.includes('WHERE id = ?')) {
+          const idx = storage.files.findIndex(f => f.id === parseInt(params[0]));
+          if (idx !== -1) storage.files.splice(idx, 1);
+        } else if (sql.includes('WHERE uploadedBy = ?')) {
+          // Delete all files uploaded by user
+          storage.files = storage.files.filter(f => f.uploadedBy !== parseInt(params[0]));
+        }
         saveStorage();
         return { changes: 1 };
       }
       if (sql.includes('DELETE FROM file_downloads')) {
-        const idx = storage.file_downloads.findIndex(f => f.fileId === params[0]);
-        if (idx !== -1) storage.file_downloads.splice(idx, 1);
+        // Support DELETE FROM file_downloads WHERE fileId = ? or userId = ?
+        if (sql.includes('WHERE fileId = ?')) {
+          storage.file_downloads = storage.file_downloads.filter(f => f.fileId !== parseInt(params[0]));
+        } else if (sql.includes('WHERE userId = ?')) {
+          storage.file_downloads = storage.file_downloads.filter(f => f.userId !== parseInt(params[0]));
+        }
         saveStorage();
         return { changes: 1 };
       }
@@ -188,8 +198,17 @@ export const db = {
         return { lastInsertRowid: id };
       }
       if (sql.includes('DELETE FROM file_access')) {
-        const idx = storage.file_access.findIndex(f => f.fileId === params[0] && f.userId === params[1]);
-        if (idx !== -1) storage.file_access.splice(idx, 1);
+        // Support DELETE FROM file_access WHERE fileId = ? AND userId = ? or WHERE userId = ?
+        if (sql.includes('WHERE fileId = ? AND userId = ?')) {
+          const idx = storage.file_access.findIndex(f => f.fileId === parseInt(params[0]) && f.userId === parseInt(params[1]));
+          if (idx !== -1) storage.file_access.splice(idx, 1);
+        } else if (sql.includes('WHERE userId = ?')) {
+          // Delete all file access for user
+          storage.file_access = storage.file_access.filter(f => f.userId !== parseInt(params[0]));
+        } else if (sql.includes('WHERE fileId = ?')) {
+          // Delete all file access for file
+          storage.file_access = storage.file_access.filter(f => f.fileId !== parseInt(params[0]));
+        }
         saveStorage();
         return { changes: 1 };
       }
