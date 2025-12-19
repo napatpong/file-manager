@@ -17,15 +17,12 @@ const Upload = () => {
 
   // Test component mount
   useEffect(() => {
-    console.error('🔴 UPLOAD COMPONENT MOUNTED - Testing Large File Upload');
-    console.error('Token:', token ? 'EXISTS' : 'MISSING');
   }, []);
 
   // No SSL certificate check needed anymore - using Worker proxy
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
-    console.warn('✅ FILE SELECTED:', selectedFile?.name, 'Size:', selectedFile?.size, 'bytes');
     setFile(selectedFile);
   };
 
@@ -39,12 +36,10 @@ const Upload = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.error('✅ === UPLOAD FORM SUBMITTED ===');
     setError('');
     setSuccess('');
 
     if (!file) {
-      console.error('❌ No file selected');
       setError('Please select a file');
       return;
     }
@@ -66,8 +61,6 @@ const Upload = () => {
     try {
       await uploadSingle();
     } catch (error) {
-      console.error('❌ === UPLOAD FAILED ===');
-      console.error('Error:', error.message);
       setError(error.message || 'Upload failed');
     } finally {
       setLoading(false);
@@ -76,7 +69,6 @@ const Upload = () => {
 
   const uploadSingle = async () => {
     // Single upload method
-    console.error('🚀 Starting file upload');
     
     const formData = new FormData();
     formData.append('file', file);
@@ -100,8 +92,6 @@ const Upload = () => {
         const bytesDiff = progressEvent.loaded - lastProgressBytes;
         const speedMBps = (bytesDiff / 1024 / 1024) / (timeDiff / 1000);
         
-        console.error(`⬆️ ${progress}% (${(progressEvent.loaded/1024/1024).toFixed(1)}MB / ${(progressEvent.total/1024/1024).toFixed(1)}MB) - Speed: ${speedMBps.toFixed(2)} MB/s`);
-        
         setUploadProgress(progress);
         setUploadedBytes(progressEvent.loaded);
         setTotalBytes(progressEvent.total);
@@ -111,7 +101,6 @@ const Upload = () => {
       }
     });
 
-    console.error('✅ Upload successful!');
     setSuccess('File uploaded successfully!');
     setFile(null);
     setDescription('');

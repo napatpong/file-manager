@@ -86,7 +86,6 @@ const Dashboard = () => {
       setDownloadingId(null);
       setDownloadProgress(0);
     } catch (err) {
-      console.error('Download error:', err);
       alert(err.response?.data?.message || 'Download failed');
       setDownloadingId(null);
     }

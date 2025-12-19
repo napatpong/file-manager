@@ -49,19 +49,6 @@ initializeAdminUser();
 // Trust proxy and allow X-Forwarded headers
 app.set('trust proxy', true);
 
-// Add request logging middleware for large uploads
-app.use((req, res, next) => {
-  if (req.method === 'POST' && req.path.includes('/upload')) {
-    console.log('[SERVER] 🔵 === NEW REQUEST ===');
-    console.log('[SERVER] 📝 Method:', req.method);
-    console.log('[SERVER] 📝 Path:', req.path);
-    console.log('[SERVER] 📝 Content-Type:', req.headers['content-type']);
-    console.log('[SERVER] 📝 Content-Length:', req.headers['content-length']);
-    console.log('[SERVER] 📝 Auth Header:', req.headers['authorization'] ? 'Present' : 'Missing');
-  }
-  next();
-});
-
 // CORS configuration - allow all origins
 app.use(cors({
   origin: '*',
