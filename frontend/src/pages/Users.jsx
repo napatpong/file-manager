@@ -219,7 +219,8 @@ const Users = () => {
                       className="w-full px-2 py-1 border border-gray-300 rounded"
                     />
                   ) : (
-                    user.email
+                    <span>{user.email}</span>
+                  )}
                 </td>
                 <td className="px-6 py-4">
                   {editingId === user.id ? (
