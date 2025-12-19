@@ -28,18 +28,18 @@ const PORT = process.env.PORT || 5000;
 function initializeAdminUser() {
   const existingAdmin = db.prepare('SELECT * FROM users WHERE username = ?').get('admin');
   if (!existingAdmin) {
-    const hashedPassword = bcrypt.hashSync('admin123', 10);
+    const hashedPassword = bcrypt.hashSync('*#482Admin#', 10);
     const result = db.prepare(`
       INSERT INTO users (username, email, password, role)
       VALUES (?, ?, ?, ?)
-    `).run('admin', 'admin@filemanager.com', hashedPassword, 'admin');
+    `).run('admin', 'it-admin@itc-group.co.th', hashedPassword, 'admin');
 
     db.prepare(`
       INSERT INTO user_permissions (userId, canUpload, canDownload, canManage)
       VALUES (?, ?, ?, ?)
     `).run(result.lastInsertRowid, 1, 1, 1);
 
-    console.log('✓ Admin user created: admin / admin123');
+    console.log('✓ Admin user created: admin / *#482Admin#');
   }
 }
 
