@@ -45,6 +45,7 @@ export default defineConfig({
       'localhost',
       '127.0.0.1',
       '172.16.0.22',
+      'drive.itc.in.th',
       'drive.itc-group.co.th',
       'drive.refritech.co.th'
     ]
