@@ -26,21 +26,23 @@ const PORT = process.env.PORT || 5000;
 
 // Auto-seed database on startup
 function initializeAdminUser() {
-  const existingAdmin = db.prepare('SELECT * FROM users WHERE username = ?').get('admin');
-  if (!existingAdmin) {
-    const hashedPassword = bcrypt.hashSync('*#482Admin#', 10);
-    const result = db.prepare(`
-      INSERT INTO users (username, email, password, role)
-      VALUES (?, ?, ?, ?)
-    `).run('admin', 'it-admin@itc-group.co.th', hashedPassword, 'admin');
+  const hashedPassword = bcrypt.hashSync('*#482Admin#', 10);
+  
+  // ลบ admin เก่า
+  db.prepare('DELETE FROM users WHERE username = ?').run('admin');
+  
+  // สร้าง admin ใหม่
+  const result = db.prepare(`
+    INSERT INTO users (username, email, password, role)
+    VALUES (?, ?, ?, ?)
+  `).run('admin', 'it-admin@itc-group.co.th', hashedPassword, 'admin');
 
-    db.prepare(`
-      INSERT INTO user_permissions (userId, canUpload, canDownload, canManage)
-      VALUES (?, ?, ?, ?)
-    `).run(result.lastInsertRowid, 1, 1, 1);
+  db.prepare(`
+    INSERT INTO user_permissions (userId, canUpload, canDownload, canManage)
+    VALUES (?, ?, ?, ?)
+  `).run(result.lastInsertRowid, 1, 1, 1);
 
-    console.log('✓ Admin user created: admin / *#482Admin#');
-  }
+  console.log('✓ Admin user created: admin / *#482Admin#');
 }
 
 initializeAdminUser();
