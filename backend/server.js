@@ -119,6 +119,11 @@ if (useSSL) {
     console.log(`🔧 Environment: ${process.env.NODE_ENV}`);
     console.log(`⚠️  Using self-signed certificate`);
   });
+
+  // Also start HTTP server on port 2086 for development/debugging
+  app.listen(2086, () => {
+    console.log(`ℹ️  HTTP Server (development) is running on port 2086 for testing`);
+  });
 } else {
   // HTTP server (fallback)
   server = app.listen(PORT, () => {
