@@ -116,7 +116,15 @@ if (useSSL) {
   });
 }
 
-// Set timeout for large file uploads (10 minutes)
-server.setTimeout(600000);
-server.keepAliveTimeout = 600000;
-server.headersTimeout = 700000;
+// Set timeout for large file uploads (30 minutes)
+server.setTimeout(1800000); // 30 minutes
+server.keepAliveTimeout = 1800000;
+server.headersTimeout = 1900000;
+
+// Handle socket timeout
+server.on('clientError', (err, socket) => {
+  if (err.code === 'ECONNRESET' || !socket.writable) {
+    return;
+  }
+  socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
+});

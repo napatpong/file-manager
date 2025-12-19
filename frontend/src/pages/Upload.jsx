@@ -82,7 +82,7 @@ const Upload = () => {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'multipart/form-data'
       },
-      timeout: 600000,
+      timeout: 1800000, // 30 minutes
       maxContentLength: Infinity,
       maxBodyLength: Infinity,
       onUploadProgress: (progressEvent) => {
