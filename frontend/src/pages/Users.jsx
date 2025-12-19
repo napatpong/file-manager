@@ -197,39 +197,22 @@ const Users = () => {
                   <div className="space-y-1">
                     <p>Upload: {user.canUpload ? '✓' : '✗'}</p>
                     <p>Download: {user.canDownload ? '✓' : '✗'}</p>
-                  </div>}
+                  </div>
                 </td>
                 <td className="px-6 py-4">
-                  {editingId === user.id ? (
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => handleSave(user.id)}
-                        className="bg-green-600 hover:bg-green-700 text-white font-semibold py-1 px-3 rounded transition"
-                      >
-                        Save
-                      </button>
-                      <button
-                        onClick={() => setEditingId(null)}
-                        className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-1 px-3 rounded transition"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => handleDelete(user.id)}
-                      disabled={currentUser?.id === user.id}
-                      className={`${
-                        currentUser?.id === user.id
-                          ? 'bg-gray-400 cursor-not-allowed'
-                          : 'bg-red-600 hover:bg-red-700'
-                      } text-white font-semibold py-1 px-3 rounded flex items-center space-x-1 transition`}
-                      title={currentUser?.id === user.id ? 'Cannot delete your own account' : 'Delete user'}
-                    >
-                      <FiTrash2 />
-                      <span>Delete</span>
-                    </button>
-                  )}
+                  <button
+                    onClick={() => handleDelete(user.id)}
+                    disabled={currentUser?.id === user.id}
+                    className={`${
+                      currentUser?.id === user.id
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-red-600 hover:bg-red-700'
+                    } text-white font-semibold py-1 px-3 rounded flex items-center space-x-1 transition`}
+                    title={currentUser?.id === user.id ? 'Cannot delete your own account' : 'Delete user'}
+                  >
+                    <FiTrash2 />
+                    <span>Delete</span>
+                  </button>
                 </td>
               </tr>
             ))}
