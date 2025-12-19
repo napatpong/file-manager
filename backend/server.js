@@ -62,8 +62,14 @@ app.use(cors({
   origin: '*',
   credentials: false,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-file-id', 'x-chunk-index', 'x-total-chunks', 'x-chunk-size']
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-file-id', 'x-chunk-index', 'x-total-chunks', 'x-chunk-size'],
+  exposedHeaders: ['Content-Length', 'X-JSON-Response'],
+  optionsSuccessStatus: 200
 }));
+
+// Handle preflight requests explicitly
+app.options('*', cors());
+
 // Increase body size limit to 2GB for large file uploads
 app.use(express.json({ limit: '2gb' }));
 app.use(express.urlencoded({ limit: '2gb', extended: true }));
