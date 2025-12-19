@@ -4,7 +4,7 @@
 const API_URL = '/api'
 
 // Direct backend URL for file uploads (bypasses Worker limits)
-const DIRECT_BACKEND_URL = 'https://driveback.itc-group.co.th:2087/api'
+const DIRECT_BACKEND_URL = 'https://drive.itc.in.th:2087/api'
 
 export default API_URL
 export { DIRECT_BACKEND_URL }
