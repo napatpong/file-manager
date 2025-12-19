@@ -32,13 +32,13 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',
-    port: isDev ? 3000 : 12443,
+    port: isDev ? 3000 : 2096,
     open: isDev ? true : false,
     https: isDev ? false : httpsConfig
   },
   preview: {
     host: '0.0.0.0',
-    port: 12443,
+    port: 2096,
     open: false,
     https: httpsConfig,
     allowedHosts: [
