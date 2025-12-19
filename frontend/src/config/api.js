@@ -1,10 +1,9 @@
 // API URL configuration
-// Use relative /api path for most requests - Cloudflare Worker proxies to backend
-// For large file uploads, use direct backend URL to avoid Worker 100MB limit and 30s timeout
-const API_URL = '/api'
+// Use environment variable if provided, otherwise use /api relative path
+const API_URL = import.meta.env.VITE_API_URL || '/api'
 
 // Direct backend URL for file uploads (bypasses Worker limits)
-const DIRECT_BACKEND_URL = 'https://drive.itc.in.th:2087/api'
+const DIRECT_BACKEND_URL = import.meta.env.VITE_API_URL || 'https://drive.itc.in.th:2087/api'
 
 export default API_URL
 export { DIRECT_BACKEND_URL }
