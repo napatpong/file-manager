@@ -6,6 +6,7 @@ build/
 *.db
 uploads/*
 !uploads/.gitkeep
+backend/database/data.json
 .DS_Store
 .idea/
 .vscode/
