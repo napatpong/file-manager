@@ -179,69 +179,25 @@ const Users = () => {
             {users.map((user) => (
               <tr key={user.id} className="border-b hover:bg-gray-50">
                 <td className="px-6 py-4">
-                  {editingId === user.id ? (
-                    <input
-                      type="text"
-                      value={editData.username}
-                      onChange={(e) => setEditData({ ...editData, username: e.target.value })}
-                      className="w-full px-2 py-1 border border-gray-300 rounded"
-                    />
-                  ) : (
-                    <span className="flex items-center space-x-2">
-                      <FiUser className="text-blue-500" />
-                      <span>{user.username}</span>
-                    </span>
-                  )}
+                  <span className="flex items-center space-x-2">
+                    <FiUser className="text-blue-500" />
+                    <span>{user.username}</span>
+                  </span>
                 </td>
                 <td className="px-6 py-4">
-                  {editingId === user.id ? (
-                    <select
-                      value={editData.role}
-                      onChange={(e) => setEditData({ ...editData, role: e.target.value })}
-                      className="w-full px-2 py-1 border border-gray-300 rounded"
-                    >
-                      <option value="downloader">Downloader</option>
-                      <option value="uploader">Uploader</option>
-                      <option value="admin">Admin</option>
-                    </select>
-                  ) : (
-                    <span className={`px-3 py-1 rounded text-white text-sm font-semibold ${
-                      user.role === 'admin' ? 'bg-red-500' :
-                      user.role === 'uploader' ? 'bg-blue-500' :
-                      'bg-gray-500'
-                    }`}>
-                      {user.role}
-                    </span>
-                  )}
+                  <span className={`px-3 py-1 rounded text-white text-sm font-semibold ${
+                    user.role === 'admin' ? 'bg-red-500' :
+                    user.role === 'uploader' ? 'bg-blue-500' :
+                    'bg-gray-500'
+                  }`}>
+                    {user.role}
+                  </span>
                 </td>
                 <td className="px-6 py-4 text-sm">
-                  {editingId === user.id ? (
-                    <div className="space-y-2">
-                      <label className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          checked={editData.canUpload}
-                          onChange={(e) => setEditData({ ...editData, canUpload: e.target.checked })}
-                          className="w-4 h-4"
-                        />
-                        <span>Can Upload</span>
-                      </label>
-                      <label className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          checked={editData.canDownload}
-                          onChange={(e) => setEditData({ ...editData, canDownload: e.target.checked })}
-                          className="w-4 h-4"
-                        />
-                        <span>Can Download</span>
-                      </label>
-                    </div>
-                  ) : (
-                    <div className="space-y-1">
-                      <p>Upload: {user.canUpload ? '✓' : '✗'}</p>
-                      <p>Download: {user.canDownload ? '✓' : '✗'}</p>
-                    </div>
-                  )}
+                  <div className="space-y-1">
+                    <p>Upload: {user.canUpload ? '✓' : '✗'}</p>
+                    <p>Download: {user.canDownload ? '✓' : '✗'}</p>
+                  </div>}
                 </td>
                 <td className="px-6 py-4">
                   {editingId === user.id ? (
