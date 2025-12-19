@@ -1,19 +1,33 @@
 {
   "name": "file-manager-app",
   "version": "1.0.0",
-  "description": "File Manager Application with Backend and Frontend",
+  "description": "File Manager Application - Unified Backend and Frontend",
   "type": "module",
+  "main": "server.js",
   "scripts": {
-    "install:all": "cd backend && npm install && cd ../frontend && npm install && cd ..",
-    "build:all": "cd frontend && npm run build && cd ..",
-    "dev:all": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "dev:backend": "cd backend && npm start",
+    "install:all": "npm install && cd frontend && npm install && cd ..",
+    "build": "cd frontend && npm run build",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:frontend\"",
+    "dev:server": "nodemon server.js",
     "dev:frontend": "cd frontend && npm run dev",
-    "prod:all": "pm2 start ecosystem.config.js && cd frontend && npm run preview"
+    "start": "npm run build && node server.js",
+    "preview": "vite preview",
+    "seed": "node seed.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "iconv-lite": "^0.7.1",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "sqlite": "^5.1.1"
   },
   "devDependencies": {
     "@cloudflare/kv-asset-handler": "^0.4.1",
     "concurrently": "^8.2.2",
-    "wrangler": "^4.55.0"
+    "wrangler": "^4.55.0",
+    "nodemon": "^3.0.2"
   }
 }
