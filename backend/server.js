@@ -67,7 +67,7 @@ app.use(cors({
   origin: '*',
   credentials: false,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-file-id', 'x-chunk-index', 'x-total-chunks', 'x-chunk-size']
 }));
 // Increase body size limit to 2GB for large file uploads
 app.use(express.json({ limit: '2gb' }));
