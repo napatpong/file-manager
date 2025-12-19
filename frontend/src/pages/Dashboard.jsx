@@ -161,7 +161,7 @@ const Dashboard = () => {
               <div className="flex items-start justify-between mb-4">
                 <FiFile className="text-4xl text-blue-500" />
                 <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">
-                  {(file.filesize / 1024).toFixed(2)} KB
+                  {formatFileSize(file.filesize)}
                 </span>
               </div>
 
@@ -242,7 +242,7 @@ const Dashboard = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">
-                    {(file.filesize / 1024).toFixed(2)} KB
+                    {formatFileSize(file.filesize)}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">
                     {getGrantedLabel(file)}

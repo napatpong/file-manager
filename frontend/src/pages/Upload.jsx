@@ -178,7 +178,7 @@ const Upload = () => {
               </p>
               {file && (
                 <p className="text-sm text-gray-500 mt-2">
-                  Size: {(file.size / 1024).toFixed(2)} KB
+                  Size: {formatFileSize(file.size)}
                 </p>
               )}
             </label>
