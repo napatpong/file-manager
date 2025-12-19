@@ -60,7 +60,11 @@ const Users = () => {
     }
   };
 
-  const handleDelete = async (userId) => {
+  const handleDelete = async (userId, userRole) => {
+    if (userRole === 'admin') {
+      alert('Cannot delete admin user');
+      return;
+    }
     if (!window.confirm('Are you sure you want to delete this user?')) return;
 
     try {
@@ -222,7 +226,7 @@ const Users = () => {
                     </span>
                   )}
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-6 py-4 min-w-[280px]">
                   {editingId === user.id ? (
                     <input
                       type="email"
@@ -310,8 +314,10 @@ const Users = () => {
                         <span>Edit</span>
                       </button>
                       <button
-                        onClick={() => handleDelete(user.id)}
-                        className="bg-red-600 hover:bg-red-700 text-white font-semibold py-1 px-3 rounded flex items-center space-x-1 transition"
+                        onClick={() => handleDelete(user.id, user.role)}
+                        disabled={user.role === 'admin'}
+                        className={`${user.role === 'admin' ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'} text-white font-semibold py-1 px-3 rounded flex items-center space-x-1 transition`}
+                        title={user.role === 'admin' ? 'Cannot delete admin user' : 'Delete user'}
                       >
                         <FiTrash2 />
                         <span>Delete</span>
