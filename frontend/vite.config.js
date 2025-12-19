@@ -34,7 +34,15 @@ export default defineConfig({
     host: '0.0.0.0',
     port: isDev ? 2095 : 2096,
     open: isDev ? true : false,
-    https: isDev ? false : httpsConfig
+    https: isDev ? false : httpsConfig,
+    allowedHosts: [
+      'localhost',
+      '127.0.0.1',
+      '172.16.0.22',
+      'drive.itc.in.th',
+      'drive.itc-group.co.th',
+      'drive.refritech.co.th'
+    ]
   },
   preview: {
     host: '0.0.0.0',
