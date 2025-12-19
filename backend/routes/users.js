@@ -28,12 +28,17 @@ router.post('/', auth, checkRole(['admin']), async (req, res) => {
     const { username, email, password, role } = req.body;
 
     // Validate input
-    if (!username || !email || !password) {
-      return res.status(400).json({ message: 'Username, email, and password are required' });
+    if (!username || !password) {
+      return res.status(400).json({ message: 'Username and password are required' });
     }
 
     // Check if user exists
-    const existingUser = db.prepare('SELECT * FROM users WHERE username = ? OR email = ?').get(username, email);
+    let existingUser;
+    if (email) {
+      existingUser = db.prepare('SELECT * FROM users WHERE username = ? OR email = ?').get(username, email);
+    } else {
+      existingUser = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
+    }
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists' });
     }
@@ -44,7 +49,7 @@ router.post('/', auth, checkRole(['admin']), async (req, res) => {
     // Create user
     const result = db.prepare('INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)').run(
       username,
-      email,
+      email || null,
       hashedPassword,
       role || 'downloader'
     );

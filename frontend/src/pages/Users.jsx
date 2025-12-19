@@ -14,7 +14,6 @@ const Users = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [createData, setCreateData] = useState({
     username: '',
-    email: '',
     password: '',
     role: 'downloader'
   });
@@ -41,7 +40,6 @@ const Users = () => {
     setEditingId(user.id);
     setEditData({
       username: user.username,
-      email: user.email,
       role: user.role,
       canUpload: user.canUpload,
       canDownload: user.canDownload
@@ -61,10 +59,6 @@ const Users = () => {
   };
 
   const handleDelete = async (userId, userRole) => {
-    if (userRole === 'admin') {
-      alert('Cannot delete admin user');
-      return;
-    }
     if (!window.confirm('Are you sure you want to delete this user?')) return;
 
     try {
@@ -80,8 +74,8 @@ const Users = () => {
   const handleCreateUser = async (e) => {
     e.preventDefault();
     
-    if (!createData.username || !createData.email || !createData.password) {
-      alert('Please fill in all fields');
+    if (!createData.username || !createData.password) {
+      alert('Please fill in username and password');
       return;
     }
 
@@ -91,7 +85,7 @@ const Users = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert('User created successfully!');
-      setCreateData({ username: '', email: '', password: '', role: 'downloader' });
+      setCreateData({ username: '', password: '', role: 'downloader' });
       setShowCreateForm(false);
       fetchUsers();
     } catch (err) {
@@ -140,16 +134,6 @@ const Users = () => {
                   onChange={(e) => setCreateData({ ...createData, username: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter username"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
-                <input
-                  type="email"
-                  value={createData.email}
-                  onChange={(e) => setCreateData({ ...createData, email: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter email"
                 />
               </div>
               <div>
@@ -236,7 +220,6 @@ const Users = () => {
                     />
                   ) : (
                     user.email
-                  )}
                 </td>
                 <td className="px-6 py-4">
                   {editingId === user.id ? (
@@ -314,10 +297,9 @@ const Users = () => {
                         <span>Edit</span>
                       </button>
                       <button
-                        onClick={() => handleDelete(user.id, user.role)}
-                        disabled={user.role === 'admin'}
-                        className={`${user.role === 'admin' ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'} text-white font-semibold py-1 px-3 rounded flex items-center space-x-1 transition`}
-                        title={user.role === 'admin' ? 'Cannot delete admin user' : 'Delete user'}
+                        onClick={() => handleDelete(user.id)}
+                        className="bg-red-600 hover:bg-red-700 text-white font-semibold py-1 px-3 rounded flex items-center space-x-1 transition"
+                        title="Delete user"
                       >
                         <FiTrash2 />
                         <span>Delete</span>
