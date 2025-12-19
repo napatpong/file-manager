@@ -49,6 +49,14 @@ initializeAdminUser();
 // Trust proxy and allow X-Forwarded headers
 app.set('trust proxy', true);
 
+// Request logging middleware - log ALL requests
+app.use((req, res, next) => {
+  if (req.method === 'POST' || req.method === 'PUT') {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.path} - Content-Length: ${req.headers['content-length']}`);
+  }
+  next();
+});
+
 // CORS configuration - allow all origins
 app.use(cors({
   origin: '*',
