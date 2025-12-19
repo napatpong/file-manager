@@ -44,12 +44,18 @@ const Upload = () => {
       return;
     }
 
-    // Check file size limit (2GB maximum)
-    const fileSizeMB = file.size / (1024 * 1024);
-    const MAX_FILE_SIZE_MB = 2048; // 2GB
+    // Check if user is authenticated
+    if (!token) {
+      setError('You are not authenticated. Please log in first.');
+      return;
+    }
+
+    // Check file size limit (50GB maximum)
+    const fileSizeGB = file.size / (1024 * 1024 * 1024);
+    const MAX_FILE_SIZE_GB = 50;
     
-    if (fileSizeMB > MAX_FILE_SIZE_MB) {
-      setError(`File is too large (${fileSizeMB.toFixed(2)} MB). Maximum file size is ${MAX_FILE_SIZE_MB} MB (2GB).`);
+    if (fileSizeGB > MAX_FILE_SIZE_GB) {
+      setError(`File is too large (${fileSizeGB.toFixed(2)} GB). Maximum file size is ${MAX_FILE_SIZE_GB} GB.`);
       return;
     }
 
@@ -78,7 +84,8 @@ const Upload = () => {
       filename: file.name,
       size: file.size,
       sizeMB: (file.size / 1024 / 1024).toFixed(2),
-      api: API_URL
+      api: API_URL,
+      hasToken: !!token
     });
 
     let lastProgressTime = Date.now();
@@ -91,7 +98,7 @@ const Upload = () => {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
         },
-        timeout: 1800000, // 30 minutes
+        timeout: 3600000, // 60 minutes for large files
         maxContentLength: Infinity,
         maxBodyLength: Infinity,
         onUploadProgress: (progressEvent) => {
@@ -128,13 +135,17 @@ const Upload = () => {
         code: err.code,
         message: err.message,
         response: err.response?.status,
-        responseData: err.response?.data
+        stack: err.stack
       });
       
       if (err.code === 'ECONNABORTED') {
-        setError('Upload timeout - request took too long');
+        setError('Upload timeout - request took too long (60 minutes)');
+      } else if (err.response?.status === 401) {
+        setError('Authentication failed - please log in again');
+      } else if (err.response?.status === 413) {
+        setError('File too large - server rejected the upload');
       } else if (!err.response) {
-        setError('Network error - no response from server. Check browser console for details.');
+        setError(`Network error: ${err.message}. Check browser console and make sure server is running at ${API_URL}`);
       } else {
         setError(err.response?.data?.message || err.message || 'Upload failed');
       }
