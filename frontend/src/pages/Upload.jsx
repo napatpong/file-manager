@@ -134,7 +134,7 @@ const Upload = () => {
       if (err.code === 'ECONNABORTED') {
         setError('Upload timeout - request took too long');
       } else if (!err.response) {
-        setError('Network error - no response from server. Check browser console for details.';
+        setError('Network error - no response from server. Check browser console for details.');
       } else {
         setError(err.response?.data?.message || err.message || 'Upload failed');
       }
