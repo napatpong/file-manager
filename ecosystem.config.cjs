@@ -12,7 +12,7 @@ module.exports = {
         HTTP_PORT: 2086,
         JWT_SECRET: 'your_jwt_secret_key_change_in_production',
         DATABASE_PATH: './backend/database/data.json',
-        UPLOAD_DIR: './uploads'
+        UPLOAD_DIR: '/var/www/www.itc.in.th/downloads'
       },
       error_file: './logs/error.log',
       out_file: './logs/out.log',
